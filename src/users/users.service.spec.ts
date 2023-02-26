@@ -1,27 +1,13 @@
-import { ConflictException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { randomUUID } from 'crypto';
-import { UsersRepository } from './repository/users-repository';
+import { PrismaService } from 'src/database/prisma.service';
 import { UsersService } from './users.service';
 
 describe('UsersService', () => {
   let service: UsersService;
 
-  const mockUsersRepository = {
-    create: jest
-      .fn()
-      .mockImplementation((dto) =>
-        Promise.resolve({ id: randomUUID(), ...dto }),
-      ),
-    findByEmail: jest.fn(),
-  };
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        UsersService,
-        { provide: UsersRepository, useValue: mockUsersRepository },
-      ],
+      providers: [UsersService, PrismaService],
     }).compile();
 
     service = module.get<UsersService>(UsersService);

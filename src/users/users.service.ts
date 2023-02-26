@@ -5,19 +5,21 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { PrismaService } from 'src/database/prisma.service';
 import { CryptHelper } from 'src/shared/crypt-helper';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { UsersRepository } from './repository/users-repository';
 
 @Injectable()
 export class UsersService {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const userExists = await this.usersRepository.findByEmail(
-      createUserDto.email,
-    );
+    const userExists = await this.prisma.user.findFirst({
+      where: {
+        email: createUserDto.email,
+      },
+    });
 
     if (userExists) {
       throw new ConflictException('There is already a user with this email.');
@@ -25,17 +27,25 @@ export class UsersService {
 
     const hashedPassword = await CryptHelper.encrypt(createUserDto.password, 8);
 
-    createUserDto.password = hashedPassword;
-
-    return this.usersRepository.create(createUserDto);
+    return this.prisma.user.create({
+      data: {
+        name: createUserDto.name,
+        email: createUserDto.email,
+        password: hashedPassword,
+      },
+    });
   }
 
   findAll(): Promise<User[]> {
-    return this.usersRepository.findAll();
+    return this.prisma.user.findMany();
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.usersRepository.findById(id);
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id,
+      },
+    });
 
     if (!user) {
       throw new NotFoundException('User not found.');
@@ -54,16 +64,33 @@ export class UsersService {
       throw new BadRequestException('Wrong old password.');
     }
 
-    return this.usersRepository.update(id, updateUserDto);
+    const hashedNewPassword = await CryptHelper.encrypt(
+      updateUserDto.password,
+      8,
+    );
+
+    return this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        name: updateUserDto.name,
+        password: hashedNewPassword,
+      },
+    });
   }
 
   async remove(id: string): Promise<User> {
-    const user = await this.usersRepository.findById(id);
+    const user = await this.prisma.user.findFirst({
+      where: { id },
+    });
 
     if (!user) {
       throw new NotFoundException('User not found.');
     }
 
-    return this.usersRepository.remove(id);
+    return this.prisma.user.delete({
+      where: { id },
+    });
   }
 }

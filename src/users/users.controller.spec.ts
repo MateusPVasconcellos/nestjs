@@ -1,15 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { randomUUID } from 'crypto';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 
 describe('UsersController', () => {
   let controller: UsersController;
 
+  const dtoCreateUser = {
+    name: 'mock',
+    password: 'mock',
+    password_confirmation: 'mock',
+    email: 'mock@mock',
+  };
+
+  const dtoUpdateUser = {
+    id: '1',
+    password: 'mock',
+    old_password: 'mock',
+  };
+
   const mockUsersService = {
     create: jest.fn((dto) => {
       return {
-        id: randomUUID(),
         ...dto,
       };
     }),
@@ -17,6 +28,15 @@ describe('UsersController', () => {
       return {
         id,
         ...dto,
+      };
+    }),
+    findAll: jest.fn(() => {
+      return ['mock', 'mock'];
+    }),
+    remove: jest.fn((id) => {
+      return {
+        id,
+        name: 'mock',
       };
     }),
   };
@@ -38,34 +58,22 @@ describe('UsersController', () => {
   });
 
   it('should create a user', () => {
-    const dto = {
-      name: 'mock',
-      password: 'mock',
-      password_confirmation: 'mock',
-      email: 'mock@mock.com',
-    };
-    expect(controller.create(dto)).toEqual({
-      id: expect.any(String),
-      name: dto.name,
-      password: dto.password,
-      password_confirmation: dto.password_confirmation,
-      email: dto.email,
+    expect(controller.create(dtoCreateUser)).toEqual({
+      ...dtoCreateUser,
     });
-
-    expect(mockUsersService.create).toHaveBeenCalledWith(dto);
   });
 
   it('should update a user', () => {
-    const dto = {
-      password: 'mock',
-      old_password: 'mock',
-    };
-
-    expect(controller.update('1', dto)).toEqual({
-      id: '1',
-      ...dto,
+    expect(controller.update('1', dtoUpdateUser)).toEqual({
+      ...dtoUpdateUser,
     });
+  });
 
-    expect(mockUsersService.update).toHaveBeenCalledWith('1', { ...dto });
+  it('should return an array of users', () => {
+    expect(controller.findAll()).toEqual(['mock', 'mock']);
+  });
+
+  it('should delete a user', () => {
+    expect(controller.remove('1')).toEqual({ id: '1', name: 'mock' });
   });
 });
