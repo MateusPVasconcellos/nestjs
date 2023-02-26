@@ -57,7 +57,13 @@ export class UsersService {
     return this.usersRepository.update(id, updateUserDto);
   }
 
-  remove(id: string): Promise<User> {
+  async remove(id: string): Promise<User> {
+    const user = await this.usersRepository.findById(id);
+
+    if (!user) {
+      throw new NotFoundException('User not found.');
+    }
+
     return this.usersRepository.remove(id);
   }
 }
