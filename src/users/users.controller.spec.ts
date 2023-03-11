@@ -1,79 +1,96 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 describe('UsersController', () => {
   let controller: UsersController;
-
-  const dtoCreateUser = {
-    name: 'mock',
-    password: 'mock',
-    password_confirmation: 'mock',
-    email: 'mock@mock',
-  };
-
-  const dtoUpdateUser = {
-    id: '1',
-    password: 'mock',
-    old_password: 'mock',
-  };
-
-  const mockUsersService = {
-    create: jest.fn((dto) => {
-      return {
-        ...dto,
-      };
-    }),
-    update: jest.fn((id, dto) => {
-      return {
-        id,
-        ...dto,
-      };
-    }),
-    findAll: jest.fn(() => {
-      return ['mock', 'mock'];
-    }),
-    remove: jest.fn((id) => {
-      return {
-        id,
-        name: 'mock',
-      };
-    }),
-  };
+  let service: UsersService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
-      providers: [UsersService],
-    })
-      .overrideProvider(UsersService)
-      .useValue(mockUsersService)
-      .compile();
+      providers: [
+        {
+          provide: UsersService,
+          useValue: {
+            create: jest.fn(),
+            findAll: jest.fn(),
+            update: jest.fn(),
+            remove: jest.fn(),
+          },
+        },
+      ],
+    }).compile();
 
     controller = module.get<UsersController>(UsersController);
+    service = module.get<UsersService>(UsersService);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+  describe('create', () => {
+    it('should create a user', async () => {
+      const createUserDto: CreateUserDto = {
+        name: 'Test User',
+        email: 'test@example.com',
+        password: 'testpassword',
+        password_confirmation: 'testpassword',
+      };
 
-  it('should create a user', () => {
-    expect(controller.create(dtoCreateUser)).toEqual({
-      ...dtoCreateUser,
+      await controller.create(createUserDto);
+
+      expect(service.create).toHaveBeenCalledWith(createUserDto);
     });
   });
 
-  it('should update a user', () => {
-    expect(controller.update('1', dtoUpdateUser)).toEqual({
-      ...dtoUpdateUser,
+  describe('findAll', () => {
+    it('should return an array of users', async () => {
+      const users = [
+        {
+          id: 1,
+          name: 'Test User 1',
+          email: 'test1@example.com',
+          password: 'testpassword1',
+        },
+        {
+          id: 2,
+          name: 'Test User 2',
+          email: 'test2@example.com',
+          password: 'testpassword2',
+        },
+      ];
+
+      (service.findAll as jest.Mock).mockResolvedValue(users);
+
+      const result = await controller.findAll();
+
+      expect(result).toEqual(users);
     });
   });
 
-  it('should return an array of users', () => {
-    expect(controller.findAll()).toEqual(['mock', 'mock']);
+  describe('update', () => {
+    it('should update a user', async () => {
+      const id = '1';
+      const updateUserDto: UpdateUserDto = {
+        name: 'Updated Test User',
+        email: 'updatedtest@example.com',
+        password: 'teste',
+        old_password: 'teste',
+      };
+
+      await controller.update(id, updateUserDto);
+
+      expect(service.update).toHaveBeenCalledWith(id, updateUserDto);
+    });
   });
 
-  it('should delete a user', () => {
-    expect(controller.remove('1')).toEqual({ id: '1', name: 'mock' });
+  describe('remove', () => {
+    it('should remove a user', async () => {
+      const id = '1';
+
+      await controller.remove(id);
+
+      expect(service.remove).toHaveBeenCalledWith(id);
+    });
   });
 });
