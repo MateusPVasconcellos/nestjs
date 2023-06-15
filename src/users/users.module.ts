@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common/decorators/modules/module.decorator';
 import { PrismaService } from 'src/database/prisma.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { RemovePasswordInterceptor } from 'src/shared/interceptor-password';
+import { CryptModule } from 'src/shared/crypt/crypt.module';
 
 @Module({
   controllers: [UsersController],
@@ -15,5 +16,6 @@ import { RemovePasswordInterceptor } from 'src/shared/interceptor-password';
       useClass: RemovePasswordInterceptor,
     },
   ],
+  imports: [CryptModule],
 })
 export class UsersModule {}

@@ -6,13 +6,13 @@ import {
 } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma.service';
-import { CryptHelper } from 'src/shared/crypt-helper';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CryptService } from 'src/shared/crypt/crypt.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService, private crypt: CryptService) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const userExists = await this.prisma.user.findFirst({
@@ -25,7 +25,7 @@ export class UsersService {
       throw new ConflictException('There is already a user with this email.');
     }
 
-    const hashedPassword = await CryptHelper.encrypt(createUserDto.password, 8);
+    const hashedPassword = await this.crypt.encrypt(createUserDto.password, 8);
 
     return this.prisma.user.create({
       data: {
@@ -55,7 +55,7 @@ export class UsersService {
       throw new BadRequestException('Old password is required.');
     }
 
-    const comparePasswords = await CryptHelper.compare(
+    const comparePasswords = await this.crypt.compare(
       updateUserDto.old_password,
       user.password,
     );
@@ -64,7 +64,7 @@ export class UsersService {
       throw new BadRequestException('Wrong old password.');
     }
 
-    const hashedNewPassword = await CryptHelper.encrypt(
+    const hashedNewPassword = await this.crypt.encrypt(
       updateUserDto.password,
       8,
     );
