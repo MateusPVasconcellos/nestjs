@@ -4,10 +4,10 @@ import { Job } from 'bull';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 @Processor('usersQueue')
-class SendMailConsumer {
+class UserConsumer {
   constructor(private mailService: MailerService) {}
 
-  @Process('usersQueue.create')
+  @Process('usersQueue.sendWelcomeEmail')
   async sendMailJob(job: Job<CreateUserDto>) {
     const { data } = job;
     await this.mailService.sendMail({
@@ -17,6 +17,11 @@ class SendMailConsumer {
       text: 'Your registration was successful',
     });
   }
+
+  @Process('usersQueue.created')
+  async verify(job: Job<CreateUserDto>) {
+    //im-
+  }
 }
 
-export { SendMailConsumer };
+export { UserConsumer };

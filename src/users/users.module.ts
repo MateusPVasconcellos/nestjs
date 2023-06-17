@@ -6,14 +6,16 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { RemovePasswordInterceptor } from 'src/shared/interceptor-password';
 import { CryptModule } from 'src/shared/crypt/crypt.module';
 import { BullModule } from '@nestjs/bull';
-import { UsersSendMailProducerService } from 'src/jobs/usersMail-producer.service';
+import { UsersProducerService } from 'src/jobs/users-producer.service';
+import { UserConsumer } from 'src/queues/users-consumer';
 
 @Module({
   controllers: [UsersController],
   providers: [
     UsersService,
     PrismaService,
-    UsersSendMailProducerService,
+    UsersProducerService,
+    UserConsumer,
     {
       provide: APP_INTERCEPTOR,
       useClass: RemovePasswordInterceptor,

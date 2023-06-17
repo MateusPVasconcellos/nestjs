@@ -9,10 +9,15 @@ import { PrismaService } from 'src/database/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CryptService } from 'src/shared/crypt/crypt.service';
+import { UsersProducerService } from 'src/jobs/users-producer.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService, private crypt: CryptService) {}
+  constructor(
+    private prisma: PrismaService,
+    private crypt: CryptService,
+    private usersProducer: UsersProducerService,
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const userExists = await this.prisma.user.findFirst({
@@ -27,13 +32,18 @@ export class UsersService {
 
     const hashedPassword = await this.crypt.encrypt(createUserDto.password, 8);
 
-    return this.prisma.user.create({
+    const createdUser = this.prisma.user.create({
       data: {
         name: createUserDto.name,
         email: createUserDto.email,
         password: hashedPassword,
       },
     });
+
+    await this.usersProducer.created(createUserDto);
+    await this.usersProducer.sendMail(createUserDto);
+
+    return createdUser;
   }
 
   findAll(): Promise<User[]> {
