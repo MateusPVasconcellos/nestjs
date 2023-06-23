@@ -7,25 +7,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Product {
-  id            String          @id @default(cuid())
-  name          String
-  price         Decimal         @db.Decimal(10, 2)
-  quantity      Int
-  created_at    DateTime        @default(now())
-  updated_at    DateTime        @updatedAt
-  orderProducts OrderProducts[]
-}
-
 model User {
-  id         String     @id @default(cuid())
-  name       String
-  email      String     @unique
-  password   String
-  avatar     String?
-  created_at DateTime   @default(now())
-  updated_at DateTime   @updatedAt
-  userToken  UserToken?
+  id         String   @id @default(cuid())
+  email      String   @unique @db.VarChar(50)
+  password   String   @db.VarChar(50)
+  role_id    String
+  active     Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  token             UserToken?
+  userDetail        UserDetail?
+  userAddress       UserAddress?
+  Event             Event[]
+  EventCandidate    EventCandidate[]
+  EventCollaborator EventCollaborator[]
+
+  role UserRole @relation(fields: [role_id], references: [id])
+
+  @@index([id, email, role_id])
 }
 
 model UserToken {
@@ -36,47 +36,125 @@ model UserToken {
   updated_at DateTime @updatedAt
 
   user User @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
 }
 
-model Customer {
-  id            String         @id @default(cuid())
-  name          String
-  email         String         @unique
-  created_at    DateTime       @default(now())
-  updated_at    DateTime       @updatedAt
-  customerToken CustomerToken?
-  order         Order[]
+model UserDetail {
+  id           String   @id @default(cuid())
+  name         String   @db.VarChar(100)
+  phone_number String   @db.VarChar(20)
+  avatar_url   String   @db.VarChar(200)
+  type_person  String   @db.Char(1)
+  cpf_cnpj     String   @db.VarChar(14)
+  user_id      String   @unique
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@index([user_id, cpf_cnpj, name])
 }
 
-model CustomerToken {
-  id          String   @id @default(cuid())
-  token       String
-  customer_id String   @unique
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  customer Customer @relation(fields: [customer_id], references: [id])
-}
-
-model Order {
-  id          String   @id @default(cuid())
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-  customer_id String   @unique
-
-  customer      Customer        @relation(fields: [customer_id], references: [id])
-  orderProducts OrderProducts[]
-}
-
-model OrderProducts {
+model UserAddress {
   id         String   @id @default(cuid())
-  price      Decimal  @db.Decimal(10, 2)
-  quantity   Int
+  cep        String   @db.Char(8)
+  uf         String   @db.Char(2)
+  address    String   @db.VarChar(100)
+  city       String   @db.VarChar(50)
+  number     String   @db.VarChar(50)
+  district   String   @db.VarChar(50)
+  user_id    String   @unique
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  order_id   String
-  product_id String
 
-  order   Order   @relation(fields: [order_id], references: [id])
-  product Product @relation(fields: [product_id], references: [id])
+  user User @relation(fields: [user_id], references: [id])
+
+  @@index([user_id, city, district, uf])
+}
+
+model UserRole {
+  id         String   @id @default(cuid())
+  role       String   @db.VarChar(20)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  User User[]
+
+  @@index([id])
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  time        DateTime
+  description String   @db.VarChar(500)
+  user_id     String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  EventAddress EventAddress?
+  user         User          @relation(fields: [user_id], references: [id])
+  EventJob     EventJob[]
+
+  @@index([id, time, user_id])
+}
+
+model EventAddress {
+  id         String   @id @default(cuid())
+  cep        String   @db.Char(8)
+  uf         String   @db.Char(2)
+  address    String   @db.VarChar(100)
+  city       String   @db.VarChar(50)
+  number     String   @db.VarChar(50)
+  district   String   @db.VarChar(50)
+  event_id   String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  event Event @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  @@index([event_id, uf, city, district])
+}
+
+model EventJob {
+  id           String   @id @default(cuid())
+  event_id     String
+  description  String   @db.VarChar(500)
+  name         String   @db.VarChar(50)
+  payment_hour Decimal  @db.Decimal(8, 2)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  EventCandidate    EventCandidate[]
+  EventCollaborator EventCollaborator[]
+
+  event Event @relation(fields: [event_id], references: [id], onDelete: Cascade)
+
+  @@index([id, event_id, name, payment_hour])
+}
+
+model EventCandidate {
+  user_id    String
+  job_id     String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  job  EventJob @relation(fields: [job_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, job_id])
+  @@index([user_id, job_id])
+}
+
+model EventCollaborator {
+  user_id    String
+  job_id     String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  job  EventJob @relation(fields: [job_id], references: [id], onDelete: Cascade)
+
+  @@id([user_id, job_id])
+  @@index([user_id, job_id])
 }
