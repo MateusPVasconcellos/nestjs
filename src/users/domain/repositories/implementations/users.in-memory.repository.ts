@@ -3,24 +3,13 @@ import { User } from '../../entities/user.entity';
 import { UsersRepository } from '../user.repository.interface';
 
 export class UsersInMemoryRepository implements UsersRepository {
-  private users: User[] = [];
-
-  findById(id: number): Promise<User> {
+  create(user: User): Promise<User> {
     throw new Error('Method not implemented.');
   }
-  update(user: User, id: number): Promise<User> {
+  findAll(): Promise<User[]> {
     throw new Error('Method not implemented.');
   }
-  delete(id: number): Promise<void> {
+  findByEmail(email: string): Promise<User> {
     throw new Error('Method not implemented.');
-  }
-
-  async create(user: User) {
-    this.users.push(user);
-    return user;
-  }
-
-  async findAll() {
-    return this.users;
   }
 }

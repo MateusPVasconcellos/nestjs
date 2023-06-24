@@ -2,6 +2,9 @@ import { Injectable, Provider } from '@nestjs/common';
 import { USERS_REPOSITORY_TOKEN } from './user.repository.interface';
 import { ConfigModule } from '@nestjs/config';
 import { DataSource } from 'src/shared/enums/dataSource.enum';
+import { UsersPrismaRepository } from './implementations/user.prisma.repository';
+import { UsersInMemoryRepository } from './implementations/users.in-memory.repository';
+import { PrismaService } from 'src/database/prisma.service';
 
 export function provideUsersRepository(): Provider[] {
   return [
@@ -20,8 +23,8 @@ async function provideUsersRepositoryFactory(
 ) {
   await ConfigModule.envVariablesLoaded;
   switch (process.env.DATABASE_DATASOURCE) {
-    case DataSource.TYPEORM:
-      return new UsersTypeOrmRepository(dependenciesProvider.typeOrmRepository);
+    case DataSource.PRISMA:
+      return new UsersPrismaRepository(dependenciesProvider.prisma);
     case DataSource.MEMORY:
     default:
       return new UsersInMemoryRepository();
@@ -30,8 +33,5 @@ async function provideUsersRepositoryFactory(
 
 @Injectable()
 export class UsersRepoDependenciesProvider {
-  constructor(
-    @InjectRepository(User)
-    public typeOrmRepository: Repository<User>,
-  ) {}
+  constructor(public prisma: PrismaService) {}
 }

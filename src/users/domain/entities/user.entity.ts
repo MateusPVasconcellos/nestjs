@@ -4,10 +4,10 @@ import { UserRole } from './userRole.entity';
 import { UserToken } from './userToken.entity';
 
 export class User {
-  readonly id: string;
+  readonly id?: string;
   readonly password: string;
   readonly email: string;
-  readonly role: string;
+  readonly role?: string;
 
   readonly userDetail?: UserDetail;
   readonly userAddress?: UserAddress;

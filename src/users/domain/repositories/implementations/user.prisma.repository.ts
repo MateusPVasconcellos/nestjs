@@ -3,11 +3,11 @@ import { PrismaService } from 'src/database/prisma.service';
 import { User } from '../../entities/user.entity';
 import { UserRole } from 'src/shared/enums/userrole.enum';
 
-export class UsersTypeOrmRepository implements UsersRepository {
+export class UsersPrismaRepository implements UsersRepository {
   constructor(private prisma: PrismaService) {}
 
   async create(user: User): Promise<User> {
-    await this.prisma.user.create({
+    const createdUser = await this.prisma.user.create({
       data: {
         role: UserRole.USER,
         email: user.email,
@@ -15,18 +15,18 @@ export class UsersTypeOrmRepository implements UsersRepository {
       },
     });
 
-    return user;
+    return createdUser;
   }
-  findAll(): Promise<User[]> {
-    throw new Error('Method not implemented.');
+
+  async findAll(): Promise<User[]> {
+    return await this.prisma.user.findMany();
   }
-  findById(id: number): Promise<User> {
-    throw new Error('Method not implemented.');
-  }
-  update(user: User, id: number): Promise<User> {
-    throw new Error('Method not implemented.');
-  }
-  delete(id: number): Promise<void> {
-    throw new Error('Method not implemented.');
+
+  async findByEmail(email: string): Promise<User> {
+    return await this.prisma.user.findFirst({
+      where: {
+        email,
+      },
+    });
   }
 }
