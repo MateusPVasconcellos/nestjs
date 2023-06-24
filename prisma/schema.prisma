@@ -11,7 +11,7 @@ model User {
   id         String   @id @default(cuid())
   email      String   @unique @db.VarChar(50)
   password   String   @db.VarChar(50)
-  role_id    String
+  role       String
   active     Boolean  @default(false)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -19,13 +19,11 @@ model User {
   token             UserToken?
   userDetail        UserDetail?
   userAddress       UserAddress?
-  Event             Event[]
-  EventCandidate    EventCandidate[]
-  EventCollaborator EventCollaborator[]
+  event             Event[]
+  eventCandidate    EventCandidate[]
+  eventCollaborator EventCollaborator[]
 
-  role UserRole @relation(fields: [role_id], references: [id])
-
-  @@index([id, email, role_id])
+  @@index([id, email])
 }
 
 model UserToken {
@@ -73,13 +71,12 @@ model UserAddress {
   @@index([user_id, city, district, uf])
 }
 
-model UserRole {
-  id         String   @id @default(cuid())
-  role       String   @db.VarChar(20)
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  User User[]
+model UserRoleEnum {
+  id          String   @id @default(cuid())
+  role        String   @db.VarChar(20)
+  permissions String[]
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
   @@index([id])
 }
@@ -92,9 +89,9 @@ model Event {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  EventAddress EventAddress?
+  eventAddress EventAddress?
   user         User          @relation(fields: [user_id], references: [id])
-  EventJob     EventJob[]
+  eventJob     EventJob[]
 
   @@index([id, time, user_id])
 }
@@ -125,8 +122,8 @@ model EventJob {
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
 
-  EventCandidate    EventCandidate[]
-  EventCollaborator EventCollaborator[]
+  eventCandidate    EventCandidate[]
+  eventCollaborator EventCollaborator[]
 
   event Event @relation(fields: [event_id], references: [id], onDelete: Cascade)
 

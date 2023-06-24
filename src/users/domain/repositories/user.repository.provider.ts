@@ -1,7 +1,7 @@
 import { Injectable, Provider } from '@nestjs/common';
 import { USERS_REPOSITORY_TOKEN } from './user.repository.interface';
 import { ConfigModule } from '@nestjs/config';
-import { DataSource } from 'src/shared/enums/datasource.enum';
+import { DataSource } from 'src/shared/enums/dataSource.enum';
 
 export function provideUsersRepository(): Provider[] {
   return [
