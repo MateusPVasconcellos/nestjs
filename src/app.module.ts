@@ -3,6 +3,7 @@ import { UsersModule } from './users/users.module';
 import { BullModule } from '@nestjs/bull';
 import { MailerModule, MailerOptions } from '@nestjs-modules/mailer';
 import { ConfigModule, ConfigType } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
 import redisConfig from './config/redis.config';
 import mailConfig from './config/mail.config';
 
@@ -37,6 +38,7 @@ import mailConfig from './config/mail.config';
       }),
       inject: [mailConfig.KEY],
     }),
+    AuthModule,
   ],
 })
 export class AppModule {}
