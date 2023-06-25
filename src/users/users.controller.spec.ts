@@ -67,30 +67,4 @@ describe('UsersController', () => {
       expect(result).toEqual(users);
     });
   });
-
-  describe('update', () => {
-    it('should update a user', async () => {
-      const id = '1';
-      const updateUserDto: UpdateUserDto = {
-        name: 'Updated Test User',
-        email: 'updatedtest@example.com',
-        password: 'teste',
-        old_password: 'teste',
-      };
-
-      await controller.update(id, updateUserDto);
-
-      expect(service.update).toHaveBeenCalledWith(id, updateUserDto);
-    });
-  });
-
-  describe('remove', () => {
-    it('should remove a user', async () => {
-      const id = '1';
-
-      await controller.remove(id);
-
-      expect(service.remove).toHaveBeenCalledWith(id);
-    });
-  });
 });

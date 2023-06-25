@@ -7,6 +7,8 @@ import { CryptModule } from 'src/shared/crypt/crypt.module';
 import { BullModule } from '@nestjs/bull';
 import { UsersProducerService } from 'src/jobs/users-producer.service';
 import { UserConsumer } from 'src/queues/users-consumer';
+import { provideUsersRepository } from './domain/repositories/user.repository.provider';
+import { PrismaService } from 'src/database/prisma.service';
 
 @Module({
   controllers: [UsersController],
@@ -14,6 +16,8 @@ import { UserConsumer } from 'src/queues/users-consumer';
     UsersService,
     UsersProducerService,
     UserConsumer,
+    PrismaService,
+    ...provideUsersRepository(),
     {
       provide: APP_INTERCEPTOR,
       useClass: RemovePasswordInterceptor,

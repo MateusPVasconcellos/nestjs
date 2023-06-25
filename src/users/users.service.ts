@@ -1,16 +1,20 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CryptService } from 'src/shared/crypt/crypt.service';
 import { UsersProducerService } from 'src/jobs/users-producer.service';
-import { UsersRepository } from './domain/repositories/user.repository.interface';
+import {
+  USERS_REPOSITORY_TOKEN,
+  UsersRepository,
+} from './domain/repositories/user.repository.interface';
 import { User } from './domain/entities/user.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
+    @Inject(USERS_REPOSITORY_TOKEN)
+    private userRepository: UsersRepository,
     private crypt: CryptService,
     private usersProducer: UsersProducerService,
-    private userRepository: UsersRepository,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {

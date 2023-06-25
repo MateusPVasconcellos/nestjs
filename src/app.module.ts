@@ -22,6 +22,7 @@ import mailConfig from './config/mail.config';
       }),
       inject: [redisConfig.KEY],
     }),
+
     MailerModule.forRootAsync({
       imports: [ConfigModule.forRoot({ load: [mailConfig] })],
       useFactory: (
