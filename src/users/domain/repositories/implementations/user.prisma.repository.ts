@@ -1,7 +1,6 @@
 import { UsersRepository } from '../user.repository.interface';
 import { PrismaService } from 'src/database/prisma.service';
 import { User } from '../../entities/user.entity';
-import { UserRole } from 'src/shared/enums/userrole.enum';
 
 export class UsersPrismaRepository implements UsersRepository {
   constructor(private prisma: PrismaService) {}
