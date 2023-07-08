@@ -6,6 +6,8 @@ import { ConfigModule, ConfigType } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import redisConfig from './config/redis.config';
 import mailConfig from './config/mail.config';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Global()
 @Module({
@@ -40,6 +42,12 @@ import mailConfig from './config/mail.config';
       inject: [mailConfig.KEY],
     }),
     AuthModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
   ],
 })
 export class AppModule {}
