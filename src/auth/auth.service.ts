@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CryptService } from 'src/shared/crypt/crypt.service';
 import { UsersService } from 'src/users/users.service';
 
@@ -23,6 +23,6 @@ export class AuthService {
       }
     }
 
-    throw new Error('Incorrect credentials.');
+    throw new UnauthorizedException('Invalid credentials');
   }
 }
