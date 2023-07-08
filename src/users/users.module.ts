@@ -29,5 +29,6 @@ import { PrismaService } from 'src/database/prisma.service';
       name: 'usersQueue',
     }),
   ],
+  exports: [UsersService],
 })
 export class UsersModule {}

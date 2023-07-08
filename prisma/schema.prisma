@@ -11,8 +11,8 @@ model User {
   id         String   @id @default(cuid())
   email      String   @unique @db.VarChar(50)
   password   String   @db.VarChar(50)
-  role       String
   active     Boolean  @default(false)
+  role_id    String
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
@@ -22,6 +22,7 @@ model User {
   event             Event[]
   eventCandidate    EventCandidate[]
   eventCollaborator EventCollaborator[]
+  UserRoleEnum      UserRoleEnum?       @relation(fields: [role_id], references: [id])
 
   @@index([id, email])
 }
@@ -77,6 +78,8 @@ model UserRoleEnum {
   permissions String[]
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
+
+  user User[]
 
   @@index([id])
 }

@@ -12,9 +12,9 @@ import { User } from './domain/entities/user.entity';
 export class UsersService {
   constructor(
     @Inject(USERS_REPOSITORY_TOKEN)
-    private userRepository: UsersRepository,
-    private crypt: CryptService,
-    private usersProducer: UsersProducerService,
+    private readonly userRepository: UsersRepository,
+    private readonly crypt: CryptService,
+    private readonly usersProducer: UsersProducerService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -39,5 +39,9 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     return await this.userRepository.findAll();
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    return await this.userRepository.findByEmail(email);
   }
 }
