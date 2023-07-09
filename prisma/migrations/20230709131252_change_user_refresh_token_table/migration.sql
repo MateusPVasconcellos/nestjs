@@ -13,7 +13,7 @@ DROP TABLE "UserToken";
 -- CreateTable
 CREATE TABLE "UserRefreshToken" (
     "id" TEXT NOT NULL,
-    "hashedToken" TEXT NOT NULL,
+    "hashed_token" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
