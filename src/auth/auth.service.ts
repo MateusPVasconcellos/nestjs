@@ -14,17 +14,29 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signin(user: User): Promise<UserToken> {
-    const payload: UserPayload = {
+  private getTokens(user: User) {
+    const tokenPayload: UserPayload = {
       sub: user.id,
       email: user.email,
     };
 
-    const jwtToken = this.jwtService.sign(payload);
+    const [accessToken, refreshToken] = [
+      this.jwtService.sign(tokenPayload, { secret: '123', expiresIn: '1d' }),
+      this.jwtService.sign(tokenPayload, { secret: '123', expiresIn: '7d' }),
+    ];
 
     return {
-      access_token: jwtToken,
-      refresh_token: '',
+      accessToken,
+      refreshToken,
+    };
+  }
+
+  async signin(user: User): Promise<UserToken> {
+    const tokens = this.getTokens(user);
+
+    return {
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken,
     };
   }
 

@@ -10,16 +10,7 @@ import { LoginValidationMiddleware } from './middlewares/login-validation.middle
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 
 @Module({
-  imports: [
-    UsersModule,
-    CryptModule,
-    JwtModule.register({
-      secret: '1234',
-      signOptions: {
-        expiresIn: '7d',
-      },
-    }),
-  ],
+  imports: [UsersModule, CryptModule, JwtModule.register({})],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy, JwtRefreshStrategy],
 })
