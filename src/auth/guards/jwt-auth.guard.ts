@@ -38,7 +38,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       if (error instanceof UnauthorizedError) {
         throw new UnauthorizedException(error.message);
       }
-      console.log('error' + error.message);
       throw new UnauthorizedException();
     });
   }

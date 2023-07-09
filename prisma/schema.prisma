@@ -16,25 +16,25 @@ model User {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 
-  token             UserToken?
   userDetail        UserDetail?
   userAddress       UserAddress?
   event             Event[]
   eventCandidate    EventCandidate[]
   eventCollaborator EventCollaborator[]
-  UserRoleEnum      UserRoleEnum?       @relation(fields: [role_id], references: [id])
+  roleEnum          UserRoleEnum?       @relation(fields: [role_id], references: [id])
+  refreshToken      UserRefreshToken?
 
   @@index([id, email])
 }
 
-model UserToken {
-  id         String   @id @default(cuid())
-  token      String
-  user_id    String   @unique
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+model UserRefreshToken {
+  id          String   @id @default(cuid())
+  hashedToken String
+  user_id     String   @unique
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
 
-  user User @relation(fields: [user_id], references: [id])
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id])
 }
