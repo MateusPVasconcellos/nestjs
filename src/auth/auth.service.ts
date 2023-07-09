@@ -51,8 +51,8 @@ export class AuthService {
     };
 
     const [access_token, refresh_token] = [
-      this.jwtService.sign(tokenPayload, { secret: '123', expiresIn: '1d' }),
-      this.jwtService.sign(tokenPayload, { secret: '123', expiresIn: '7d' }),
+      this.jwtService.sign(tokenPayload, { secret: '1234', expiresIn: '1d' }),
+      this.jwtService.sign(tokenPayload, { secret: '1234', expiresIn: '7d' }),
     ];
 
     return {
