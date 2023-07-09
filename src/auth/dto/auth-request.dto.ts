@@ -1,5 +1,5 @@
 import { User } from '../../users/domain/entities/user.entity';
 
-export class AuthRequest extends Request {
+export class AuthRequestDto extends Request {
   user: User;
 }

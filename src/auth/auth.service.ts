@@ -2,9 +2,9 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CryptService } from 'src/shared/crypt/crypt.service';
 import { User } from 'src/users/domain/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
-import { UserPayload } from './models/user-payload.model';
 import { JwtService } from '@nestjs/jwt';
 import { UserToken } from './models/user-token.model';
+import { UserPayload } from './models/user-payload.model';
 
 @Injectable()
 export class AuthService {
@@ -24,6 +24,7 @@ export class AuthService {
 
     return {
       access_token: jwtToken,
+      refresh_token: '',
     };
   }
 
