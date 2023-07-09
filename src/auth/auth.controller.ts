@@ -18,12 +18,27 @@ import { User } from 'src/users/domain/entities/user.entity';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('login')
+  @Post('signin')
   @HttpCode(HttpStatus.OK)
   @UseGuards(LocalAuthGuard)
   @IsPublic()
-  login(@Request() req: AuthRequest) {
-    return this.authService.login(req.user);
+  signin(@Request() req: AuthRequest) {
+    return this.authService.signin(req.user);
+  }
+
+  @Post('signup')
+  signup(@Request() req: AuthRequest) {
+    return this.authService.signup(req.user);
+  }
+
+  @Post('logout')
+  logout(@Request() req: AuthRequest) {
+    return this.authService.logout(req.user);
+  }
+
+  @Post('refresh')
+  refresh(@Request() req: AuthRequest) {
+    return this.authService.refresh(req.user);
   }
 
   @Get('/me')

@@ -14,7 +14,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async login(user: User): Promise<UserToken> {
+  async signin(user: User): Promise<UserToken> {
     const payload: UserPayload = {
       sub: user.id,
       email: user.email,
@@ -25,6 +25,17 @@ export class AuthService {
     return {
       access_token: jwtToken,
     };
+  }
+
+  signup(user: User) {
+    throw new Error('Method not implemented.');
+  }
+
+  refresh(user: User) {
+    throw new Error('Method not implemented.');
+  }
+  logout(user: User) {
+    throw new Error('Method not implemented.');
   }
 
   async validateUser(email: string, password: string) {
