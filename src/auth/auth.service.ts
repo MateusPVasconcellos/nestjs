@@ -5,6 +5,7 @@ import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { UserToken } from './models/user-token.model';
 import { UserPayload } from './models/user-payload.model';
+import { AuthRepository } from './domain/repositories/auth.repository.interface';
 
 @Injectable()
 export class AuthService {
@@ -12,9 +13,10 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly crypt: CryptService,
     private readonly jwtService: JwtService,
+    private readonly authRepository: AuthRepository,
   ) {}
 
-  private getTokens(user: User): UserToken {
+  private generateTokens(user: User): UserToken {
     const tokenPayload: UserPayload = {
       sub: user.id,
       email: user.email,
@@ -37,9 +39,13 @@ export class AuthService {
   }
 
   async signin(user: User): Promise<UserToken> {
-    const tokens = this.getTokens(user);
+    const tokens = this.generateTokens(user);
 
-    const hashedRefreshToken = this.hashRefreshToken(tokens.refresh_token);
+    const hashedRefreshToken = await this.hashRefreshToken(
+      tokens.refresh_token,
+    );
+
+    await this.authRepository.saveHashedRefreshToken(hashedRefreshToken, user);
 
     return tokens;
   }
