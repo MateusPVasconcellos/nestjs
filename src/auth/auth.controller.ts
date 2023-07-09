@@ -9,10 +9,10 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { IsPublic } from './decorators/is-public.decoretor';
 import { CurrentUser } from './decorators/current-user.decoretor';
 import { User } from 'src/users/domain/entities/user.entity';
 import { AuthRequestDto } from './dto/auth-request.dto';
+import { IsPublic } from './decorators/is-public.decoretor';
 
 @Controller()
 export class AuthController {
@@ -23,6 +23,7 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @IsPublic()
   signin(@Request() req: AuthRequestDto) {
+    console.log('##3', req.user);
     return this.authService.signin(req.user);
   }
 

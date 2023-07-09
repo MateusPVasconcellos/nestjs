@@ -18,6 +18,18 @@ export class AuthPrismaRepository implements AuthRepository {
     hashedRefreshToken: string,
     user: User,
   ): Promise<UserRefreshToken> {
+    const oldToken = await this.prisma.userRefreshToken.findFirst();
+
+    if (!oldToken) {
+      const newHashedRefreshToken = await this.prisma.userRefreshToken.create({
+        data: {
+          hashed_token: hashedRefreshToken,
+          user_id: user.id,
+        },
+      });
+
+      return newHashedRefreshToken;
+    }
     const newHashedRefreshToken = await this.prisma.userRefreshToken.update({
       where: {
         user_id: user.id,
