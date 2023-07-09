@@ -14,30 +14,34 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  private getTokens(user: User) {
+  private getTokens(user: User): UserToken {
     const tokenPayload: UserPayload = {
       sub: user.id,
       email: user.email,
     };
 
-    const [accessToken, refreshToken] = [
+    const [access_token, refresh_token] = [
       this.jwtService.sign(tokenPayload, { secret: '123', expiresIn: '1d' }),
       this.jwtService.sign(tokenPayload, { secret: '123', expiresIn: '7d' }),
     ];
 
     return {
-      accessToken,
-      refreshToken,
+      access_token,
+      refresh_token,
     };
+  }
+
+  private async hashRefreshToken(refresh_token: UserToken['refresh_token']) {
+    const hashedToken = await this.crypt.encrypt(refresh_token, 10);
+    return hashedToken;
   }
 
   async signin(user: User): Promise<UserToken> {
     const tokens = this.getTokens(user);
 
-    return {
-      access_token: tokens.accessToken,
-      refresh_token: tokens.refreshToken,
-    };
+    const hashedRefreshToken = this.hashRefreshToken(tokens.refresh_token);
+
+    return tokens;
   }
 
   signup(user: User) {
