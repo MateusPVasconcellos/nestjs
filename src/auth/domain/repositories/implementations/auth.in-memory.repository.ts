@@ -1,6 +1,6 @@
 import { User } from 'src/users/domain/entities/user.entity';
+import { UserRefreshToken } from '../../entities/user-refresh-token.entity';
 import { AuthRepository } from '../auth.repository.interface';
-import { UserRefreshToken } from '@prisma/client';
 
 export class AuthInMemoryRepository implements AuthRepository {
   saveHashedRefreshToken(

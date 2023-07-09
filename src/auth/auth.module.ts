@@ -9,6 +9,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { LoginValidationMiddleware } from './middlewares/login-validation.middleware';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { PrismaService } from 'src/database/prisma.service';
+import { provideAuthRepository } from './domain/repositories/auth.repository.provider';
 
 @Module({
   imports: [UsersModule, CryptModule, JwtModule.register({})],
@@ -19,6 +20,7 @@ import { PrismaService } from 'src/database/prisma.service';
     JwtStrategy,
     JwtRefreshStrategy,
     PrismaService,
+    ...provideAuthRepository(),
   ],
 })
 export class AuthModule implements NestModule {

@@ -2,23 +2,23 @@ import { Injectable, Provider } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DataSource } from 'src/shared/enums/dataSource.enum';
 import { PrismaService } from 'src/database/prisma.service';
-import { AUTH_REPOSITORY_TOKEN } from '../domain/repositories/auth.repository.interface';
-import { AuthPrismaRepository } from '../domain/repositories/implementations/auth.prisma.repository';
-import { AuthInMemoryRepository } from '../domain/repositories/implementations/auth.in-memory.repository';
+import { AUTH_REPOSITORY_TOKEN } from './auth.repository.interface';
+import { AuthPrismaRepository } from './implementations/auth.prisma.repository';
+import { AuthInMemoryRepository } from './implementations/auth.in-memory.repository';
 
-export function provideUsersRepository(): Provider[] {
+export function provideAuthRepository(): Provider[] {
   return [
     {
       provide: AUTH_REPOSITORY_TOKEN,
       useFactory: async (dependenciesProvider: AuthRepoDependenciesProvider) =>
-        provideUsersRepositoryFactory(dependenciesProvider),
+        provideAuthRepositoryFactory(dependenciesProvider),
       inject: [AuthRepoDependenciesProvider],
     },
     AuthRepoDependenciesProvider,
   ];
 }
 
-async function provideUsersRepositoryFactory(
+async function provideAuthRepositoryFactory(
   dependenciesProvider: AuthRepoDependenciesProvider,
 ) {
   await ConfigModule.envVariablesLoaded;
