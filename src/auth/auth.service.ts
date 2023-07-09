@@ -39,8 +39,9 @@ export class AuthService {
   refresh(user: User) {
     throw new Error('Method not implemented.');
   }
-  logout(user: User) {
-    throw new Error('Method not implemented.');
+
+  async logout(user: User) {
+    await this.authRepository.deleteRefreshToken(user);
   }
 
   private generateTokens(user: User): UserToken {

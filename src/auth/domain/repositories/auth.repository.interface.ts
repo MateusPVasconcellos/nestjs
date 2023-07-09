@@ -6,6 +6,7 @@ export interface AuthRepository {
     hashedRefreshToken: string,
     user: User,
   ): Promise<UserRefreshToken>;
+  deleteRefreshToken(user: User): void;
 }
 
 export const AUTH_REPOSITORY_TOKEN = 'auth-repository-token';
