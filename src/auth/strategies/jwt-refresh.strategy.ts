@@ -5,7 +5,10 @@ import { UserPayload } from '../models/user-payload.model';
 import { Request } from 'express';
 
 @Injectable()
-export class JwtRefreshStrategy extends PassportStrategy(Strategy) {
+export class JwtRefreshStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-refresh',
+) {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

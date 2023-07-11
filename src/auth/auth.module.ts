@@ -25,6 +25,6 @@ import { provideAuthRepository } from './domain/repositories/auth.repository.pro
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoginValidationMiddleware).forRoutes('login');
+    consumer.apply(LoginValidationMiddleware).forRoutes('signin');
   }
 }

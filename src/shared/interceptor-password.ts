@@ -11,8 +11,10 @@ export class RemovePasswordInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map((value) => {
-        value.password = undefined;
-        return value;
+        if (value) {
+          value.password = undefined;
+          return value;
+        }
       }),
     );
   }

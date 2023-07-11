@@ -23,7 +23,6 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @IsPublic()
   signin(@Request() req: AuthRequestDto) {
-    console.log('##3', req.user);
     return this.authService.signin(req.user);
   }
 
@@ -32,7 +31,7 @@ export class AuthController {
     return this.authService.signup(req.user);
   }
 
-  @Post('logout')
+  @Get('logout')
   logout(@Request() req: AuthRequestDto) {
     return this.authService.logout(req.user);
   }
