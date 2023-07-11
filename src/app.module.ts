@@ -13,7 +13,6 @@ import { APP_GUARD } from '@nestjs/core';
 @Module({
   imports: [
     UsersModule,
-    ConfigModule.forRoot(),
     BullModule.forRootAsync({
       imports: [ConfigModule.forRoot({ load: [redisConfig] })],
       useFactory: (configRedis: ConfigType<typeof redisConfig>) => ({

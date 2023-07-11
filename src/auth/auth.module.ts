@@ -10,9 +10,16 @@ import { LoginValidationMiddleware } from './middlewares/login-validation.middle
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { PrismaService } from 'src/database/prisma.service';
 import { provideAuthRepository } from './domain/repositories/auth.repository.provider';
+import { ConfigModule } from '@nestjs/config/dist/config.module';
+import jwtConfig from 'src/config/jwt.config';
 
 @Module({
-  imports: [UsersModule, CryptModule, JwtModule.register({})],
+  imports: [
+    UsersModule,
+    CryptModule,
+    JwtModule.register({}),
+    ConfigModule.forRoot({ load: [jwtConfig] }),
+  ],
   controllers: [AuthController],
   providers: [
     AuthService,
