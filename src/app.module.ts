@@ -8,11 +8,13 @@ import redisConfig from './config/redis.config';
 import mailConfig from './config/mail.config';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
+import jwtConfig from './config/jwt.config';
 
 @Global()
 @Module({
   imports: [
     UsersModule,
+    ConfigModule.forRoot({ load: [jwtConfig], isGlobal: true }),
     BullModule.forRootAsync({
       imports: [ConfigModule.forRoot({ load: [redisConfig] })],
       useFactory: (configRedis: ConfigType<typeof redisConfig>) => ({
