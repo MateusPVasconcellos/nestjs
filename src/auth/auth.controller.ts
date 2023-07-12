@@ -13,6 +13,7 @@ import { CurrentUser } from './decorators/current-user.decoretor';
 import { User } from 'src/users/domain/entities/user.entity';
 import { AuthRequestDto } from './dto/auth-request.dto';
 import { IsPublic } from './decorators/is-public.decoretor';
+import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 
 @Controller()
 export class AuthController {
@@ -36,7 +37,9 @@ export class AuthController {
     return this.authService.logout(req.user);
   }
 
-  @Post('refresh')
+  @IsPublic()
+  @Get('refresh')
+  @UseGuards(JwtRefreshAuthGuard)
   refresh(@Request() req: AuthRequestDto) {
     return this.authService.refresh(req.user);
   }
