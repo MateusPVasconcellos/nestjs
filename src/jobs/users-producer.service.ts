@@ -14,6 +14,10 @@ class UsersProducerService {
   async created(createUserDto: CreateUserDto) {
     await this.queue.add('usersQueue.created', createUserDto);
   }
+
+  async signup(createUserDto: CreateUserDto) {
+    await this.queue.add('usersQueue.signup', createUserDto);
+  }
 }
 
 export { UsersProducerService };

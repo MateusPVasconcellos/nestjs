@@ -14,6 +14,7 @@ import jwtConfig from './config/jwt.config';
 @Module({
   imports: [
     UsersModule,
+    AuthModule,
     ConfigModule.forRoot({ load: [jwtConfig], isGlobal: true }),
     BullModule.forRootAsync({
       imports: [ConfigModule.forRoot({ load: [redisConfig] })],
@@ -42,7 +43,6 @@ import jwtConfig from './config/jwt.config';
       }),
       inject: [mailConfig.KEY],
     }),
-    AuthModule,
   ],
   providers: [
     {

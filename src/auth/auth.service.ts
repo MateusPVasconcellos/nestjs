@@ -1,4 +1,9 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CryptService } from 'src/shared/crypt/crypt.service';
 import { User } from 'src/users/domain/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
@@ -8,6 +13,8 @@ import {
   AuthRepository,
 } from './domain/repositories/auth.repository.interface';
 import { JwtService } from './services/jwt.service';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { UsersProducerService } from 'src/jobs/users-producer.service';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +24,7 @@ export class AuthService {
     @Inject(AUTH_REPOSITORY_TOKEN)
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
+    private readonly usersProducer: UsersProducerService,
   ) {}
 
   async signin(user: User): Promise<UserToken> {
@@ -31,8 +39,8 @@ export class AuthService {
     return tokens;
   }
 
-  signup(user: User) {
-    throw new Error('Method not implemented.');
+  async signup(createUserDto: CreateUserDto) {
+    await this.usersProducer.signup(createUserDto);
   }
 
   async refresh(user: User) {

@@ -6,6 +6,7 @@ import {
   UseGuards,
   Request,
   Get,
+  Body,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -14,6 +15,7 @@ import { User } from 'src/users/domain/entities/user.entity';
 import { AuthRequestDto } from './dto/auth-request.dto';
 import { IsPublic } from './decorators/is-public.decoretor';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 @Controller()
 export class AuthController {
@@ -27,9 +29,10 @@ export class AuthController {
     return this.authService.signin(req.user);
   }
 
+  @IsPublic()
   @Post('signup')
-  signup(@Request() req: AuthRequestDto) {
-    return this.authService.signup(req.user);
+  signup(@Body() createUserDto: CreateUserDto) {
+    return this.authService.signup(createUserDto);
   }
 
   @Get('logout')
