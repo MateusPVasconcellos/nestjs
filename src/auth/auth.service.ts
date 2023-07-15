@@ -35,8 +35,16 @@ export class AuthService {
     throw new Error('Method not implemented.');
   }
 
-  refresh(user: User) {
-    throw new Error('Method not implemented.');
+  async refresh(user: User) {
+    const tokens = this.jwtService.generateTokens(user);
+
+    const hashedRefreshToken = await this.jwtService.hashRefreshToken(
+      tokens.refresh_token,
+    );
+
+    await this.authRepository.saveHashedRefreshToken(hashedRefreshToken, user);
+
+    return tokens;
   }
 
   async logout(user: User) {

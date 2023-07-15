@@ -6,6 +6,10 @@ import { AuthRepository } from '../auth.repository.interface';
 export class AuthPrismaRepository implements AuthRepository {
   constructor(private prisma: PrismaService) {}
 
+  async getRefreshToken(user_id: string): Promise<UserRefreshToken> {
+    return await this.prisma.userRefreshToken.findFirst({ where: { user_id } });
+  }
+
   async deleteRefreshToken(user: User): Promise<void> {
     await this.prisma.userRefreshToken.deleteMany({
       where: {

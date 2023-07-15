@@ -3,7 +3,10 @@ import { UserRefreshToken } from '../../entities/user-refresh-token.entity';
 import { AuthRepository } from '../auth.repository.interface';
 
 export class AuthInMemoryRepository implements AuthRepository {
-  deleteRefreshToken(user: User): void {
+  getRefreshToken(user_id: string): Promise<UserRefreshToken> {
+    throw new Error('Method not implemented.');
+  }
+  deleteRefreshToken(user: User): Promise<void> {
     throw new Error('Method not implemented.');
   }
   saveHashedRefreshToken(
