@@ -21,12 +21,14 @@ export class JwtService {
 
     const [access_token, refresh_token] = [
       this.jwtNest.sign(tokenPayload, {
-        secret: this.configService.get('jwt.publicKey'),
+        privateKey: this.configService.get('jwt.privateKey'),
         expiresIn: this.configService.get('jwt.accessExpiresIn'),
+        algorithm: 'RS256',
       }),
       this.jwtNest.sign(tokenPayload, {
-        secret: this.configService.get('jwt.publicKey'),
+        privateKey: this.configService.get('jwt.privateKey'),
         expiresIn: this.configService.get('jwt.refreshExpiresIn'),
+        algorithm: 'RS256',
       }),
     ];
 
