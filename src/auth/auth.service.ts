@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  HttpException,
   Inject,
   Injectable,
   UnauthorizedException,
@@ -40,7 +41,7 @@ export class AuthService {
   }
 
   async signup(createUserDto: CreateUserDto) {
-    await this.usersProducer.signup(createUserDto);
+    return await this.usersProducer.signup(createUserDto);
   }
 
   async refresh(user: User) {

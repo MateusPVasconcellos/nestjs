@@ -1,5 +1,6 @@
 import { MailerService } from '@nestjs-modules/mailer';
-import { Process, Processor } from '@nestjs/bull';
+import { OnQueueFailed, Process, Processor } from '@nestjs/bull';
+import { HttpException } from '@nestjs/common';
 import { Job } from 'bull';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
@@ -10,6 +11,12 @@ class UserConsumer {
     private readonly mailService: MailerService,
     private readonly usersService: UsersService,
   ) {}
+
+  @OnQueueFailed()
+  handler(job: Job, error: Error) {
+    console.log(`Fired Excption from ${job.name}:`, error);
+    throw new HttpException(error.message, 401);
+  }
 
   @Process('usersQueue.sendWelcomeEmail')
   async sendMailJob(job: Job<CreateUserDto>) {
@@ -30,7 +37,7 @@ class UserConsumer {
   @Process('usersQueue.signup')
   async signupJob(job: Job<CreateUserDto>) {
     const { data } = job;
-    await this.usersService.create(data);
+    return await this.usersService.create(data);
   }
 }
 

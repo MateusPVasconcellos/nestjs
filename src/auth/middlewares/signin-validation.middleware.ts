@@ -8,7 +8,7 @@ import { validate } from 'class-validator';
 import { SigninDto } from '../dto/signin.dto';
 
 @Injectable()
-export class LoginValidationMiddleware implements NestMiddleware {
+export class SigninValidationMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     const body = req.body;
     const loginRequestBody = new SigninDto();

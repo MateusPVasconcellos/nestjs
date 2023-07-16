@@ -6,11 +6,12 @@ import { UsersModule } from 'src/users/users.module';
 import { CryptModule } from 'src/shared/crypt/crypt.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { LoginValidationMiddleware } from './middlewares/login-validation.middleware';
+import { SigninValidationMiddleware } from './middlewares/signin-validation.middleware';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { PrismaService } from 'src/database/prisma.service';
 import { provideAuthRepository } from './domain/repositories/auth.repository.provider';
 import { JwtService } from './services/jwt.service';
+import { SignupValidationMiddleware } from './middlewares/signup-validation.middleware';
 
 @Module({
   imports: [UsersModule, CryptModule, JwtModule.register({})],
@@ -27,6 +28,7 @@ import { JwtService } from './services/jwt.service';
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoginValidationMiddleware).forRoutes('signin');
+    consumer.apply(SigninValidationMiddleware).forRoutes('signin');
+    consumer.apply(SignupValidationMiddleware).forRoutes('signup');
   }
 }

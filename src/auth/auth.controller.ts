@@ -7,6 +7,7 @@ import {
   Request,
   Get,
   Body,
+  UseFilters,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
