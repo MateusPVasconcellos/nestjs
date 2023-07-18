@@ -2,11 +2,15 @@ import { User } from 'src/users/domain/entities/user.entity';
 import { UserRefreshToken } from '../entities/user-refresh-token.entity';
 
 export interface AuthRepository {
-  saveHashedRefreshToken(
+  updateRefreshToken(
     hashedRefreshToken: string,
-    user: User,
-  ): Promise<UserRefreshToken>;
-  deleteRefreshToken(user: User): Promise<void>;
+    user_id: string,
+  ): Promise<void>;
+  insertRefreshToken(
+    hashedRefreshToken: string,
+    user_id: string,
+  ): Promise<void>;
+  deleteRefreshToken(user_id: string): Promise<void>;
   getRefreshToken(user_id: string): Promise<UserRefreshToken>;
 }
 

@@ -1,10 +1,4 @@
-import {
-  ConflictException,
-  HttpException,
-  Inject,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CryptService } from 'src/shared/crypt/crypt.service';
 import { User } from 'src/users/domain/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
@@ -35,7 +29,13 @@ export class AuthService {
       tokens.refresh_token,
     );
 
-    await this.authRepository.saveHashedRefreshToken(hashedRefreshToken, user);
+    const oldToken = await this.authRepository.getRefreshToken(user.id);
+
+    if (!oldToken) {
+      await this.authRepository.insertRefreshToken(hashedRefreshToken, user.id);
+    }
+
+    await this.authRepository.updateRefreshToken(hashedRefreshToken, user.id);
 
     return tokens;
   }
@@ -51,13 +51,13 @@ export class AuthService {
       tokens.refresh_token,
     );
 
-    await this.authRepository.saveHashedRefreshToken(hashedRefreshToken, user);
+    await this.authRepository.updateRefreshToken(hashedRefreshToken, user.id);
 
     return tokens;
   }
 
   async logout(user: User) {
-    await this.authRepository.deleteRefreshToken(user);
+    await this.authRepository.deleteRefreshToken(user.id);
   }
 
   async validateUser(email: string, password: string) {

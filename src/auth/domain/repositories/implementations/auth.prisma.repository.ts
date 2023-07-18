@@ -5,45 +5,41 @@ import { AuthRepository } from '../auth.repository.interface';
 
 export class AuthPrismaRepository implements AuthRepository {
   constructor(private prisma: PrismaService) {}
+  async updateRefreshToken(
+    hashedRefreshToken: string,
+    user_id: string,
+  ): Promise<void> {
+    await this.prisma.userRefreshToken.update({
+      where: {
+        user_id,
+      },
+      data: {
+        hashed_token: hashedRefreshToken,
+      },
+    });
+  }
 
   async getRefreshToken(user_id: string): Promise<UserRefreshToken> {
     return await this.prisma.userRefreshToken.findFirst({ where: { user_id } });
   }
 
-  async deleteRefreshToken(user: User): Promise<void> {
+  async deleteRefreshToken(user_id: string): Promise<void> {
     await this.prisma.userRefreshToken.deleteMany({
       where: {
-        user_id: user.id,
+        user_id,
       },
     });
   }
 
-  async saveHashedRefreshToken(
+  async insertRefreshToken(
     hashedRefreshToken: string,
-    user: User,
-  ): Promise<UserRefreshToken> {
-    const oldToken = await this.prisma.userRefreshToken.findFirst();
-
-    if (!oldToken) {
-      const newHashedRefreshToken = await this.prisma.userRefreshToken.create({
-        data: {
-          hashed_token: hashedRefreshToken,
-          user_id: user.id,
-        },
-      });
-
-      return newHashedRefreshToken;
-    }
-    const newHashedRefreshToken = await this.prisma.userRefreshToken.update({
-      where: {
-        user_id: user.id,
-      },
+    user_id: string,
+  ): Promise<void> {
+    await this.prisma.userRefreshToken.create({
       data: {
         hashed_token: hashedRefreshToken,
-        user_id: user.id,
+        user_id,
       },
     });
-
-    return newHashedRefreshToken;
   }
 }
