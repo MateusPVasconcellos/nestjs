@@ -5,7 +5,7 @@ import { Job } from 'bull';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 @Processor('authQueue')
-class UserConsumer {
+class AuthConsumer {
   constructor(private readonly mailService: MailerService) {}
 
   @OnQueueFailed()
@@ -26,4 +26,4 @@ class UserConsumer {
   }
 }
 
-export { UserConsumer };
+export { AuthConsumer };

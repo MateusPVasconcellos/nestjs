@@ -14,6 +14,7 @@ import { JwtService } from './services/jwt.service';
 import { SignupValidationMiddleware } from './middlewares/signup-validation.middleware';
 import { AuthProducerService } from './jobs/auth-producer.service';
 import { BullModule } from '@nestjs/bull';
+import { AuthConsumer } from './queues/auth-consumer';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { BullModule } from '@nestjs/bull';
     JwtRefreshStrategy,
     AuthProducerService,
     PrismaService,
+    AuthConsumer,
     ...provideAuthRepository(),
   ],
 })
