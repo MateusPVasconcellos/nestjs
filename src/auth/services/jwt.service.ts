@@ -31,7 +31,6 @@ export class JwtService {
         algorithm: 'RS256',
       }),
     ];
-
     return {
       access_token,
       refresh_token,

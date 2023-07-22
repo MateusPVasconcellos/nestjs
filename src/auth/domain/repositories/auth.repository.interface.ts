@@ -1,4 +1,3 @@
-import { User } from 'src/users/domain/entities/user.entity';
 import { UserRefreshToken } from '../entities/user-refresh-token.entity';
 
 export interface AuthRepository {

@@ -24,9 +24,12 @@ export class AuthService {
 
   async signin(user: User): Promise<UserToken> {
     const tokens = this.jwtService.generateTokens(user);
+    const refreshTokenTrim = tokens.refresh_token.substring(
+      tokens.refresh_token.length - 72,
+    );
 
     const hashedRefreshToken = await this.jwtService.hashRefreshToken(
-      tokens.refresh_token,
+      refreshTokenTrim,
     );
 
     const oldToken = await this.authRepository.getRefreshToken(user.id);
@@ -47,8 +50,12 @@ export class AuthService {
   async refresh(user: User) {
     const tokens = this.jwtService.generateTokens(user);
 
+    const refreshTokenTrim = tokens.refresh_token.substring(
+      tokens.refresh_token.length - 72,
+    );
+
     const hashedRefreshToken = await this.jwtService.hashRefreshToken(
-      tokens.refresh_token,
+      refreshTokenTrim,
     );
 
     await this.authRepository.updateRefreshToken(hashedRefreshToken, user.id);
@@ -75,5 +82,20 @@ export class AuthService {
     }
 
     throw new UnauthorizedException('Invalid credentials');
+  }
+
+  async validateRefreshToken(token: string, user_id: string) {
+    const storedToken = await this.authRepository.getRefreshToken(user_id);
+
+    if (storedToken) {
+      const isTokenValid = await this.crypt.compare(
+        token.substring(token.length - 72),
+        storedToken.hashed_token,
+      );
+
+      if (!isTokenValid) {
+        throw new UnauthorizedException();
+      }
+    }
   }
 }
