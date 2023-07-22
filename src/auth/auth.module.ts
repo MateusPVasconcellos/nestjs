@@ -12,9 +12,18 @@ import { PrismaService } from 'src/database/prisma.service';
 import { provideAuthRepository } from './domain/repositories/auth.repository.provider';
 import { JwtService } from './services/jwt.service';
 import { SignupValidationMiddleware } from './middlewares/signup-validation.middleware';
+import { AuthProducerService } from './jobs/auth-producer.service';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
-  imports: [UsersModule, CryptModule, JwtModule.register({})],
+  imports: [
+    UsersModule,
+    CryptModule,
+    JwtModule.register({}),
+    BullModule.registerQueue({
+      name: 'authQueue',
+    }),
+  ],
   controllers: [AuthController],
   providers: [
     JwtService,
@@ -22,6 +31,7 @@ import { SignupValidationMiddleware } from './middlewares/signup-validation.midd
     LocalStrategy,
     JwtStrategy,
     JwtRefreshStrategy,
+    AuthProducerService,
     PrismaService,
     ...provideAuthRepository(),
   ],

@@ -1,12 +1,12 @@
-import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { CryptService } from 'src/shared/crypt/crypt.service';
-import { UsersProducerService } from 'src/jobs/users-producer.service';
+import { UsersProducerService } from 'src/users/jobs/users-producer.service';
 import {
   USERS_REPOSITORY_TOKEN,
   UsersRepository,
 } from './domain/repositories/user.repository.interface';
 import { User } from './domain/entities/user.entity';
+import { Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
@@ -24,7 +24,6 @@ export class UsersService {
     const createdUser = await this.userRepository.create(createUserDto);
 
     await this.usersProducer.created(createUserDto);
-    await this.usersProducer.sendMail(createUserDto);
 
     return createdUser;
   }

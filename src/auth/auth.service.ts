@@ -9,7 +9,7 @@ import {
 } from './domain/repositories/auth.repository.interface';
 import { JwtService } from './services/jwt.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { UsersProducerService } from 'src/jobs/users-producer.service';
+import { AuthProducerService } from './jobs/auth-producer.service';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +19,7 @@ export class AuthService {
     @Inject(AUTH_REPOSITORY_TOKEN)
     private readonly authRepository: AuthRepository,
     private readonly jwtService: JwtService,
-    private readonly usersProducer: UsersProducerService,
+    private readonly authProducer: AuthProducerService,
   ) {}
 
   async signin(user: User): Promise<UserToken> {
@@ -44,7 +44,8 @@ export class AuthService {
   }
 
   async signup(createUserDto: CreateUserDto) {
-    return await this.usersProducer.signup(createUserDto);
+    await this.usersService.create(createUserDto);
+    await this.authProducer.sendActivateEmail(createUserDto);
   }
 
   async refresh(user: User) {

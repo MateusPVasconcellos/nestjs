@@ -3,14 +3,10 @@ import { OnQueueFailed, Process, Processor } from '@nestjs/bull';
 import { HttpException } from '@nestjs/common';
 import { Job } from 'bull';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { UsersService } from 'src/users/users.service';
 
-@Processor('usersQueue')
+@Processor('authQueue')
 class UserConsumer {
-  constructor(
-    private readonly mailService: MailerService,
-    private readonly usersService: UsersService,
-  ) {}
+  constructor(private readonly mailService: MailerService) {}
 
   @OnQueueFailed()
   handler(job: Job, error: Error) {
@@ -18,7 +14,7 @@ class UserConsumer {
     throw new HttpException(error.message, 401);
   }
 
-  @Process('usersQueue.sendWelcomeEmail')
+  @Process('authQueue.sendActivateEmail')
   async sendMailJob(job: Job<CreateUserDto>) {
     const { data } = job;
     await this.mailService.sendMail({
@@ -27,17 +23,6 @@ class UserConsumer {
       subject: 'Welcome!',
       text: 'Your registration was successful',
     });
-  }
-
-  @Process('usersQueue.created')
-  async verify(job: Job<CreateUserDto>) {
-    //im-
-  }
-
-  @Process('usersQueue.signup')
-  async signupJob(job: Job<CreateUserDto>) {
-    const { data } = job;
-    return await this.usersService.create(data);
   }
 }
 

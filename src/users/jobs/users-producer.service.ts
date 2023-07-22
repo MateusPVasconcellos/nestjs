@@ -7,16 +7,8 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 class UsersProducerService {
   constructor(@InjectQueue('usersQueue') private queue: Queue) {}
 
-  async sendMail(createUserDto: CreateUserDto) {
-    await this.queue.add('usersQueue.sendWelcomeEmail', createUserDto);
-  }
-
   async created(createUserDto: CreateUserDto) {
     await this.queue.add('usersQueue.created', createUserDto);
-  }
-
-  async signup(createUserDto: CreateUserDto) {
-    await this.queue.add('usersQueue.signup', createUserDto);
   }
 }
 
