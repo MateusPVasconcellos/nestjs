@@ -26,7 +26,7 @@ export class JwtService {
         algorithm: 'RS256',
       }),
       this.jwtNest.sign(tokenPayload, {
-        privateKey: this.configService.get('jwt.privateKey'),
+        privateKey: this.configService.get('jwt.refreshPrivateKey'),
         expiresIn: this.configService.get('jwt.refreshExpiresIn'),
         algorithm: 'RS256',
       }),
