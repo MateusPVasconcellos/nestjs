@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
 import { UserPayload } from '../models/user-payload.model';
 import { UserToken } from '../models/user-token.model';
 import { User } from 'src/users/domain/entities/user.entity';
 import { JwtService as JwtNest } from '@nestjs/jwt';
 import { CryptService } from 'src/shared/crypt/crypt.service';
 import { ConfigService } from '@nestjs/config';
+import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
 
 @Injectable()
 export class JwtService {
