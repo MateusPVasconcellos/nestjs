@@ -6,7 +6,7 @@ import {
   UsersRepository,
 } from './domain/repositories/user.repository.interface';
 import { User } from './domain/entities/user.entity';
-import { Inject, Injectable } from '@nestjs/common';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
@@ -21,10 +21,13 @@ export class UsersService {
     const hashedPassword = await this.crypt.encrypt(createUserDto.password, 8);
     createUserDto.password = hashedPassword;
 
+    const user = await this.findByEmail(createUserDto.email);
+    if (user) {
+      throw new ConflictException('There is already a user with this email.');
+    }
+
     const createdUser = await this.userRepository.create(createUserDto);
-
     await this.usersProducer.created(createUserDto);
-
     return createdUser;
   }
 

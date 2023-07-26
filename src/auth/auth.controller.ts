@@ -32,6 +32,7 @@ export class AuthController {
   @IsPublic()
   @Post('signup')
   signup(@Body() createUserDto: CreateUserDto) {
+    createUserDto.password_confirmation = undefined;
     return this.authService.signup(createUserDto);
   }
 

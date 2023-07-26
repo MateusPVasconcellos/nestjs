@@ -35,10 +35,10 @@ export class AuthService {
 
   async signin(user: User): Promise<UserToken> {
     const tokens = this.jwtService.generateTokens(user);
+
     const refreshTokenTrim = tokens.refresh_token.substring(
       tokens.refresh_token.length - 72,
     );
-
     const hashedRefreshToken = await this.jwtService.hashRefreshToken(
       refreshTokenTrim,
     );
@@ -73,7 +73,6 @@ export class AuthService {
     );
 
     await this.authRepository.updateRefreshToken(hashedRefreshToken, user.id);
-
     return tokens;
   }
 

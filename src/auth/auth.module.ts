@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { LocalStrategy } from './strategies/local.strategy';
@@ -10,7 +10,6 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { PrismaService } from 'src/database/prisma.service';
 import { provideAuthRepository } from './domain/repositories/auth.repository.provider';
 import { JwtService } from './services/jwt.service';
-import { SignupValidationMiddleware } from './middlewares/signup-validation.middleware';
 import { AuthProducerService } from './jobs/auth-producer.service';
 import { BullModule } from '@nestjs/bull';
 import { AuthConsumer } from './queues/auth-consumer';
@@ -45,8 +44,4 @@ import { APP_INTERCEPTOR } from '@nestjs/core/constants';
     },
   ],
 })
-export class AuthModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    //consumer.apply(SignupValidationMiddleware).forRoutes('signup');
-  }
-}
+export class AuthModule {}
