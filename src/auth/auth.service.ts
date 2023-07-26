@@ -34,6 +34,11 @@ export class AuthService {
   }
 
   async signin(user: User): Promise<UserToken> {
+    const storedUser = await this.usersService.findByEmail(user.email);
+    if (!storedUser.active) {
+      throw new UnauthorizedException('User is not active');
+    }
+
     const tokens = this.jwtService.generateTokens(user);
 
     const refreshTokenTrim = tokens.refresh_token.substring(
@@ -73,10 +78,12 @@ export class AuthService {
     );
 
     await this.authRepository.updateRefreshToken(hashedRefreshToken, user.id);
+    this.loggerService.info(`USER REFRESH: ${JSON.stringify(user)}`);
     return tokens;
   }
 
-  async logout(user: User) {
+  async signout(user: User) {
+    this.loggerService.info(`USER SIGNOUT: ${JSON.stringify(user)}`);
     await this.authRepository.deleteRefreshToken(user.id);
   }
 

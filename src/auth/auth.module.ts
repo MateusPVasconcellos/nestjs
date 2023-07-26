@@ -14,7 +14,7 @@ import { AuthProducerService } from './jobs/auth-producer.service';
 import { BullModule } from '@nestjs/bull';
 import { AuthConsumer } from './queues/auth-consumer';
 import { LoggerModule } from 'src/shared/logger/logger.module';
-import { RemovePasswordInterceptor } from 'src/shared/interceptor-password';
+import { RemovePasswordInterceptor } from 'src/shared/interceptors/interceptor-password';
 import { APP_INTERCEPTOR } from '@nestjs/core/constants';
 
 @Module({

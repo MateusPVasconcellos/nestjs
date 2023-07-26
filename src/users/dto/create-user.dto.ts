@@ -1,6 +1,6 @@
 import { Exclude, instanceToPlain } from 'class-transformer';
 import { IsEmail, IsNotEmpty, Length, MaxLength } from 'class-validator';
-import { Match } from 'src/shared/match-decorator';
+import { Match } from 'src/shared/decorators/match-decorator';
 
 export class CreateUserDto {
   @IsNotEmpty()

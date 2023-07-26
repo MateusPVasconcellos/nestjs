@@ -36,9 +36,9 @@ export class AuthController {
     return this.authService.signup(createUserDto);
   }
 
-  @Get('logout')
-  logout(@Request() req: AuthRequestDto) {
-    return this.authService.logout(req.user);
+  @Get('signout')
+  signout(@Request() req: AuthRequestDto) {
+    return this.authService.signout(req.user);
   }
 
   @IsPublic()

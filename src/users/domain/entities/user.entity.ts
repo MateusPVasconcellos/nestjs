@@ -7,6 +7,7 @@ export class User {
   readonly id?: string;
   readonly password: string;
   readonly email: string;
+  readonly active?: boolean;
   readonly role_id?: string;
 
   readonly userDetail?: UserDetail;
