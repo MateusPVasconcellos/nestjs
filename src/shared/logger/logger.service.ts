@@ -11,7 +11,9 @@ export enum LogLevel {
 export class LoggerService {
   private _idempotencyKey: string;
   private _contextName = 'Default';
-  private readonly logger: Logger = createLogger();
+  private readonly logger: Logger = createLogger({
+    format: format.json(),
+  });
 
   constructor() {
     this.logger.configure({

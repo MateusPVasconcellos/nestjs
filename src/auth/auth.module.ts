@@ -6,7 +6,6 @@ import { UsersModule } from 'src/users/users.module';
 import { CryptModule } from 'src/shared/crypt/crypt.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { SigninValidationMiddleware } from './middlewares/signin-validation.middleware';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { PrismaService } from 'src/database/prisma.service';
 import { provideAuthRepository } from './domain/repositories/auth.repository.provider';
@@ -15,11 +14,15 @@ import { SignupValidationMiddleware } from './middlewares/signup-validation.midd
 import { AuthProducerService } from './jobs/auth-producer.service';
 import { BullModule } from '@nestjs/bull';
 import { AuthConsumer } from './queues/auth-consumer';
+import { LoggerModule } from 'src/shared/logger/logger.module';
+import { RemovePasswordInterceptor } from 'src/shared/interceptor-password';
+import { APP_INTERCEPTOR } from '@nestjs/core/constants';
 
 @Module({
   imports: [
     UsersModule,
     CryptModule,
+    LoggerModule,
     JwtModule.register({}),
     BullModule.registerQueue({
       name: 'authQueue',
@@ -36,11 +39,14 @@ import { AuthConsumer } from './queues/auth-consumer';
     PrismaService,
     AuthConsumer,
     ...provideAuthRepository(),
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: RemovePasswordInterceptor,
+    },
   ],
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SigninValidationMiddleware).forRoutes('signin');
-    consumer.apply(SignupValidationMiddleware).forRoutes('signup');
+    //consumer.apply(SignupValidationMiddleware).forRoutes('signup');
   }
 }

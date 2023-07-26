@@ -4,6 +4,7 @@ import {
   ExecutionContext,
   CallHandler,
 } from '@nestjs/common';
+import { isArray } from 'class-validator';
 import { map, Observable } from 'rxjs';
 
 @Injectable()
@@ -12,7 +13,12 @@ export class RemovePasswordInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((value) => {
         if (value) {
-          value.password = undefined;
+          if (isArray(value)) {
+            value.forEach((e) => {
+              e.password = undefined;
+            });
+          }
+          'password' in value ?? (value.password = undefined);
           return value;
         }
       }),
