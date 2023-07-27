@@ -18,6 +18,7 @@ import { AuthProducerService } from './jobs/auth-producer.service';
 import { LoggerService } from 'src/shared/logger/logger.service';
 import { validate } from 'class-validator';
 import { SigninDto } from './dto/signin.dto';
+import { UserCreatedEvent } from './events/user-created.event';
 
 @Injectable()
 export class AuthService {
@@ -44,7 +45,7 @@ export class AuthService {
     const refreshTokenTrim = tokens.refresh_token.substring(
       tokens.refresh_token.length - 72,
     );
-    const hashedRefreshToken = await this.jwtService.hashRefreshToken(
+    const hashedRefreshToken = await this.jwtService.hashToken(
       refreshTokenTrim,
     );
 
@@ -62,7 +63,18 @@ export class AuthService {
 
   async signup(createUserDto: CreateUserDto) {
     await this.usersService.create(createUserDto);
-    await this.authProducer.sendActivateEmail(createUserDto);
+
+    const activateToken = this.jwtService.generateActivateToken(
+      createUserDto.email,
+    );
+
+    await this.authProducer.sendActivateEmail(
+      new UserCreatedEvent(
+        createUserDto.name,
+        createUserDto.email,
+        activateToken,
+      ),
+    );
     this.loggerService.info(`USER SIGNUP: ${JSON.stringify(createUserDto)}`);
   }
 
@@ -73,7 +85,7 @@ export class AuthService {
       tokens.refresh_token.length - 72,
     );
 
-    const hashedRefreshToken = await this.jwtService.hashRefreshToken(
+    const hashedRefreshToken = await this.jwtService.hashToken(
       refreshTokenTrim,
     );
 

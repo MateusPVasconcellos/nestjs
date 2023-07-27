@@ -37,11 +37,25 @@ export class JwtService {
     };
   }
 
-  async hashRefreshToken(refresh_token: UserToken['refresh_token']) {
+  async hashToken(token: string) {
     const hashedToken = await this.crypt.encrypt(
-      refresh_token,
+      token,
       this.configService.get('jwt.saltRounds'),
     );
     return hashedToken;
+  }
+
+  generateActivateToken(email: string) {
+    const tokenPayload = {
+      sub: email,
+    };
+
+    const activateToken = this.jwtNest.sign(tokenPayload, {
+      privateKey: this.configService.get('jwt.accessPrivateKey'),
+      expiresIn: this.configService.get('jwt.accessExpiresIn'),
+      algorithm: 'RS256',
+    });
+
+    return activateToken;
   }
 }
