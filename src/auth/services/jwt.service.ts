@@ -5,6 +5,7 @@ import { JwtService as JwtNest } from '@nestjs/jwt';
 import { CryptService } from 'src/shared/crypt/crypt.service';
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class JwtService {
@@ -13,19 +14,27 @@ export class JwtService {
     private readonly crypt: CryptService,
     private readonly configService: ConfigService,
   ) {}
-  generateTokens(user: User): UserToken {
+  async generateTokens(user: User): Promise<UserToken> {
     const tokenPayload: UserPayload = {
       sub: user.id,
       email: user.email,
     };
 
+    const jwtJti = uuidv4();
+
+    const refreshTokenPayload: UserPayload = {
+      sub: user.id,
+      email: user.email,
+      jti: jwtJti,
+    };
+
     const [access_token, refresh_token] = [
       this.jwtNest.sign(tokenPayload, {
-        privateKey: this.configService.get('jwt.privateKey'),
+        privateKey: this.configService.get('jwt.accessPrivateKey'),
         expiresIn: this.configService.get('jwt.accessExpiresIn'),
         algorithm: 'RS256',
       }),
-      this.jwtNest.sign(tokenPayload, {
+      this.jwtNest.sign(refreshTokenPayload, {
         privateKey: this.configService.get('jwt.refreshPrivateKey'),
         expiresIn: this.configService.get('jwt.refreshExpiresIn'),
         algorithm: 'RS256',
@@ -34,15 +43,13 @@ export class JwtService {
     return {
       access_token,
       refresh_token,
+      jti: jwtJti,
     };
   }
 
-  async hashToken(token: string) {
-    const hashedToken = await this.crypt.encrypt(
-      token,
-      this.configService.get('jwt.saltRounds'),
-    );
-    return hashedToken;
+  decodeToken(token: string): UserPayload {
+    const decodedToken = this.jwtNest.decode(token);
+    return decodedToken as UserPayload;
   }
 
   generateActivateToken(email: string) {
@@ -51,8 +58,8 @@ export class JwtService {
     };
 
     const activateToken = this.jwtNest.sign(tokenPayload, {
-      privateKey: this.configService.get('jwt.accessPrivateKey'),
-      expiresIn: this.configService.get('jwt.accessExpiresIn'),
+      privateKey: this.configService.get('jwt.activatePrivateKey'),
+      expiresIn: this.configService.get('jwt.activateExpiresIn'),
       algorithm: 'RS256',
     });
 

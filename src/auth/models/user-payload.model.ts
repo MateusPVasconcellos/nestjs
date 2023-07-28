@@ -3,4 +3,5 @@ export class UserPayload {
   email: string;
   iat?: number;
   exp?: number;
+  jti?: string;
 }

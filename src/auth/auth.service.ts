@@ -40,24 +40,18 @@ export class AuthService {
       throw new UnauthorizedException('User is not active');
     }
 
-    const tokens = this.jwtService.generateTokens(user);
+    const tokens = await this.jwtService.generateTokens(user);
 
-    const refreshTokenTrim = tokens.refresh_token.substring(
-      tokens.refresh_token.length - 72,
-    );
-    const hashedRefreshToken = await this.jwtService.hashToken(
-      refreshTokenTrim,
-    );
-
-    const oldToken = await this.authRepository.getRefreshToken(user.id);
+    const oldToken = await this.authRepository.getRefreshTokenJti(user.id);
 
     if (!oldToken) {
-      await this.authRepository.insertRefreshToken(hashedRefreshToken, user.id);
+      await this.authRepository.insertRefreshTokenJti(tokens.jti, user.id);
     }
 
-    await this.authRepository.updateRefreshToken(hashedRefreshToken, user.id);
+    await this.authRepository.updateRefreshTokenJti(tokens.jti, user.id);
 
     this.loggerService.info(`USER SIGNIN: ${JSON.stringify(user)}`);
+    tokens.jti = undefined;
     return tokens;
   }
 
@@ -79,24 +73,20 @@ export class AuthService {
   }
 
   async refresh(user: User) {
-    const tokens = this.jwtService.generateTokens(user);
+    const tokens = await this.jwtService.generateTokens(user);
+    await this.authRepository.updateRefreshTokenJti(tokens.jti, user.id);
 
-    const refreshTokenTrim = tokens.refresh_token.substring(
-      tokens.refresh_token.length - 72,
-    );
-
-    const hashedRefreshToken = await this.jwtService.hashToken(
-      refreshTokenTrim,
-    );
-
-    await this.authRepository.updateRefreshToken(hashedRefreshToken, user.id);
     this.loggerService.info(`USER REFRESH: ${JSON.stringify(user)}`);
     return tokens;
   }
 
   async signout(user: User) {
     this.loggerService.info(`USER SIGNOUT: ${JSON.stringify(user)}`);
-    await this.authRepository.deleteRefreshToken(user.id);
+    await this.authRepository.deleteRefreshTokenJti(user.id);
+  }
+
+  async activate(user: User) {
+    await this.usersService
   }
 
   async validateUser(email: string, password: string) {
@@ -130,17 +120,14 @@ export class AuthService {
   }
 
   async validateRefreshToken(token: string, user_id: string) {
-    const storedToken = await this.authRepository.getRefreshToken(user_id);
+    const { jti_refresh_token } = await this.authRepository.getRefreshTokenJti(
+      user_id,
+    );
 
-    if (storedToken) {
-      const isTokenValid = await this.crypt.compare(
-        token.substring(token.length - 72),
-        storedToken.hashed_token,
-      );
-
-      if (!isTokenValid) {
+    if (jti_refresh_token) {
+      const decodedToken = this.jwtService.decodeToken(token);
+      if (jti_refresh_token !== decodedToken.jti)
         throw new UnauthorizedException();
-      }
     }
   }
 }

@@ -18,7 +18,7 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const hashedPassword = await this.crypt.encrypt(createUserDto.password, 8);
+    const hashedPassword = await this.crypt.hash(createUserDto.password, 8);
     createUserDto.password = hashedPassword;
 
     const user = await this.findByEmail(createUserDto.email);

@@ -1,5 +1,5 @@
 export class UserRefreshToken {
   id: string;
-  hashed_token: string;
+  jti_refresh_token: string;
   user_id: string;
 }

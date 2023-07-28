@@ -8,7 +8,7 @@ export class UsersPrismaRepository implements UsersRepository {
   async create(user: User): Promise<User> {
     const createdUser = await this.prisma.user.create({
       data: {
-        role_id: 'cljvrv69k0000tyk8jqnb2lf6',
+        role_id: 'clkmr3its0000ty1ovaizqdx4',
         email: user.email,
         password: user.password,
       },

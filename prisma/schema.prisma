@@ -22,21 +22,22 @@ model User {
   eventCandidate    EventCandidate[]
   eventCollaborator EventCollaborator[]
   roleEnum          UserRoleEnum?       @relation(fields: [role_id], references: [id])
-  refreshToken      UserRefreshToken?
+  userRefreshToken  UserRefreshToken?
 
   @@index([id, email])
 }
 
 model UserRefreshToken {
-  id           String   @id @default(cuid())
-  hashed_token String
-  user_id      String   @unique
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
+  id                String   @id @default(cuid())
+  jti_refresh_token String
+  user_id           String   @unique
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
 
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@index([user_id])
+  @@map("UserRefreshToken")
 }
 
 model UserDetail {

@@ -4,8 +4,8 @@ import { AuthRepository } from '../auth.repository.interface';
 
 export class AuthPrismaRepository implements AuthRepository {
   constructor(private prisma: PrismaService) {}
-  async updateRefreshToken(
-    hashedRefreshToken: string,
+  async updateRefreshTokenJti(
+    hashedTokenJti: string,
     user_id: string,
   ): Promise<void> {
     await this.prisma.userRefreshToken.update({
@@ -13,16 +13,16 @@ export class AuthPrismaRepository implements AuthRepository {
         user_id,
       },
       data: {
-        hashed_token: hashedRefreshToken,
+        jti_refresh_token: hashedTokenJti,
       },
     });
   }
 
-  async getRefreshToken(user_id: string): Promise<UserRefreshToken> {
+  async getRefreshTokenJti(user_id: string): Promise<UserRefreshToken> {
     return await this.prisma.userRefreshToken.findFirst({ where: { user_id } });
   }
 
-  async deleteRefreshToken(user_id: string): Promise<void> {
+  async deleteRefreshTokenJti(user_id: string): Promise<void> {
     await this.prisma.userRefreshToken.deleteMany({
       where: {
         user_id,
@@ -30,13 +30,13 @@ export class AuthPrismaRepository implements AuthRepository {
     });
   }
 
-  async insertRefreshToken(
-    hashedRefreshToken: string,
+  async insertRefreshTokenJti(
+    hashedTokenJti: string,
     user_id: string,
   ): Promise<void> {
     await this.prisma.userRefreshToken.create({
       data: {
-        hashed_token: hashedRefreshToken,
+        jti_refresh_token: hashedTokenJti,
         user_id,
       },
     });

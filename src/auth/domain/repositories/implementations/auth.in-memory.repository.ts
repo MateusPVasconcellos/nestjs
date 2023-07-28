@@ -4,22 +4,22 @@ import { UserRefreshToken } from '../../entities/user-refresh-token.entity';
 import { AuthRepository } from '../auth.repository.interface';
 
 export class AuthInMemoryRepository implements AuthRepository {
-  updateRefreshToken(
-    hashedRefreshToken: string,
+  updateRefreshTokenJti(
+    hashedTokenJti: string,
     user_id: string,
   ): Promise<void> {
     throw new Error('Method not implemented.');
   }
-  getRefreshToken(user_id: string): Promise<UserRefreshToken> {
-    throw new Error('Method not implemented.');
-  }
-  deleteRefreshToken(user_id: string): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
-  insertRefreshToken(
-    hashedRefreshToken: string,
+  insertRefreshTokenJti(
+    hashedTokenJti: string,
     user_id: string,
   ): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  deleteRefreshTokenJti(user_id: string): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  getRefreshTokenJti(user_id: string): Promise<UserRefreshToken> {
     throw new Error('Method not implemented.');
   }
 }
