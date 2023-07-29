@@ -2,24 +2,24 @@
 import { User } from 'src/users/domain/entities/user.entity';
 import { UserRefreshToken } from '../../entities/user-refresh-token.entity';
 import { AuthRepository } from '../auth.repository.interface';
+import { Prisma } from '@prisma/client';
 
 export class AuthInMemoryRepository implements AuthRepository {
-  updateRefreshTokenJti(
-    hashedTokenJti: string,
-    user_id: string,
-  ): Promise<void> {
+  update(params: {
+    where: Prisma.UserRefreshTokenWhereUniqueInput;
+    data: Prisma.UserRefreshTokenUpdateInput;
+  }) {
     throw new Error('Method not implemented.');
   }
-  insertRefreshTokenJti(
-    hashedTokenJti: string,
-    user_id: string,
-  ): Promise<void> {
+  create(params: { data: Prisma.UserRefreshTokenCreateInput }) {
     throw new Error('Method not implemented.');
   }
-  deleteRefreshTokenJti(user_id: string): Promise<void> {
+  delete(params: { where: Prisma.UserRefreshTokenWhereUniqueInput }) {
     throw new Error('Method not implemented.');
   }
-  getRefreshTokenJti(user_id: string): Promise<UserRefreshToken> {
+  findOne(params: {
+    where: Prisma.UserRefreshTokenWhereUniqueInput;
+  }): Promise<UserRefreshToken> {
     throw new Error('Method not implemented.');
   }
 }

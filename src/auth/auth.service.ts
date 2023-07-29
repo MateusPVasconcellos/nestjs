@@ -50,13 +50,27 @@ export class AuthService {
 
     const tokens = await this.jwtService.generateTokens(user);
 
-    const oldToken = await this.authRepository.getRefreshTokenJti(user.id);
+    const oldToken = await this.authRepository.findOne({
+      where: { user_id: user.id },
+    });
 
     if (!oldToken) {
-      await this.authRepository.insertRefreshTokenJti(tokens.jti, user.id);
+      await this.authRepository.create({
+        data: {
+          jti_refresh_token: tokens.jti,
+          user: { connect: { id: user.id } },
+        },
+      });
     }
 
-    await this.authRepository.updateRefreshTokenJti(tokens.jti, user.id);
+    await this.authRepository.update({
+      data: {
+        jti_refresh_token: tokens.jti,
+      },
+      where: {
+        user_id: user.id,
+      },
+    });
 
     this.loggerService.info(`USER SIGNIN: ${JSON.stringify(user)}`);
     tokens.jti = undefined;
@@ -106,15 +120,28 @@ export class AuthService {
 
   async refresh(user: User) {
     const tokens = await this.jwtService.generateTokens(user);
-    await this.authRepository.updateRefreshTokenJti(tokens.jti, user.id);
+    await this.authRepository.update({
+      data: {
+        jti_refresh_token: tokens.jti,
+      },
+      where: {
+        user_id: user.id,
+      },
+    });
 
     this.loggerService.info(`USER REFRESH: ${JSON.stringify(user)}`);
+    tokens.jti = undefined;
     return tokens;
   }
 
   async signout(user: User) {
+    const oldToken = await this.authRepository.findOne({
+      where: { user_id: user.id },
+    });
+    if (!oldToken) throw new UnauthorizedException();
+
+    await this.authRepository.delete({ where: { user_id: user.id } });
     this.loggerService.info(`USER SIGNOUT: ${JSON.stringify(user)}`);
-    await this.authRepository.deleteRefreshTokenJti(user.id);
   }
 
   async activate(token: string) {
@@ -158,9 +185,9 @@ export class AuthService {
   }
 
   async validateRefreshToken(token: string, user_id: string) {
-    const { jti_refresh_token } = await this.authRepository.getRefreshTokenJti(
-      user_id,
-    );
+    const { jti_refresh_token } = await this.authRepository.findOne({
+      where: { user_id: user_id },
+    });
 
     if (jti_refresh_token) {
       const decodedToken = this.jwtService.decodeToken(token);
