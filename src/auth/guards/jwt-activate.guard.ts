@@ -8,7 +8,7 @@ import {
 import { UnauthorizedError } from '../errors/unauthorized.error';
 
 @Injectable()
-export class JwtActivateAuthGuard extends AuthGuard('jwt-refresh') {
+export class JwtActivateAuthGuard extends AuthGuard('jwt-activate') {
   constructor(private reflector: Reflector) {
     super();
   }

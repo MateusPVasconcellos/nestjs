@@ -7,7 +7,7 @@ import {
   Request,
   Get,
   Body,
-  Param,
+  Query,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
@@ -53,8 +53,8 @@ export class AuthController {
   @IsPublic()
   @Get('activate')
   @UseGuards(JwtActivateAuthGuard)
-  activate(@Request() req: AuthRequestDto) {
-    return this.authService.activate(req.user);
+  activate(@Query('token') token: string) {
+    return this.authService.activate(token);
   }
 
   @Get('/me')

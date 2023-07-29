@@ -1,12 +1,12 @@
 import {
   BadRequestException,
+  ConflictException,
   Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CryptService } from 'src/shared/crypt/crypt.service';
 import { User } from 'src/users/domain/entities/user.entity';
-import { UsersService } from 'src/users/users.service';
 import { UserToken } from './models/user-token.model';
 import {
   AUTH_REPOSITORY_TOKEN,
@@ -19,14 +19,19 @@ import { LoggerService } from 'src/shared/logger/logger.service';
 import { validate } from 'class-validator';
 import { SigninDto } from './dto/signin.dto';
 import { UserCreatedEvent } from './events/user-created.event';
+import {
+  USERS_REPOSITORY_TOKEN,
+  UsersRepository,
+} from 'src/users/domain/repositories/user.repository.interface';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
     private readonly crypt: CryptService,
     @Inject(AUTH_REPOSITORY_TOKEN)
     private readonly authRepository: AuthRepository,
+    @Inject(USERS_REPOSITORY_TOKEN)
+    private readonly userRepository: UsersRepository,
     private readonly jwtService: JwtService,
     private readonly authProducer: AuthProducerService,
     private readonly loggerService: LoggerService,
@@ -35,7 +40,10 @@ export class AuthService {
   }
 
   async signin(user: User): Promise<UserToken> {
-    const storedUser = await this.usersService.findByEmail(user.email);
+    const storedUser = await this.userRepository.findOne({
+      where: { email: user.email },
+    });
+
     if (!storedUser.active) {
       throw new UnauthorizedException('User is not active');
     }
@@ -56,10 +64,34 @@ export class AuthService {
   }
 
   async signup(createUserDto: CreateUserDto) {
-    await this.usersService.create(createUserDto);
+    const hashedPassword = await this.crypt.hash(createUserDto.password, 8);
+    createUserDto.password = hashedPassword;
+
+    const user = await this.userRepository.findOne({
+      where: { email: createUserDto.email },
+    });
+
+    if (user) {
+      throw new ConflictException('There is already a user with this email.');
+    }
+
+    const createdUser = await this.userRepository.create({
+      data: {
+        email: createUserDto.email,
+        password: createUserDto.password,
+        userDetail: {
+          create: {
+            name: createUserDto.name,
+            type_person: createUserDto.type_person,
+            cpf_cnpj: createUserDto.cpf_cnpj,
+          },
+        },
+        roleEnum: { connect: { id: 'clkmr3its0000ty1ovaizqdx4' } },
+      },
+    });
 
     const activateToken = this.jwtService.generateActivateToken(
-      createUserDto.email,
+      createdUser.email,
     );
 
     await this.authProducer.sendActivateEmail(
@@ -85,8 +117,14 @@ export class AuthService {
     await this.authRepository.deleteRefreshTokenJti(user.id);
   }
 
-  async activate(user: User) {
-    await this.usersService
+  async activate(token: string) {
+    const { sub } = this.jwtService.decodeToken(token);
+    const user = await this.userRepository.findOne({ where: { email: sub } });
+
+    if (user.active) throw new UnauthorizedException();
+
+    const params = { where: { email: sub }, data: { active: true } };
+    return this.userRepository.update(params);
   }
 
   async validateUser(email: string, password: string) {
@@ -104,7 +142,7 @@ export class AuthService {
       );
     }
 
-    const user = await this.usersService.findByEmail(email);
+    const user = await this.userRepository.findOne({ where: { email } });
     if (user) {
       const isPasswordValid = await this.crypt.compare(password, user.password);
 

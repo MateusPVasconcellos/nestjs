@@ -58,8 +58,8 @@ export class JwtService {
     };
 
     const activateToken = this.jwtNest.sign(tokenPayload, {
-      privateKey: this.configService.get('jwt.activatePrivateKey'),
-      expiresIn: this.configService.get('jwt.activateExpiresIn'),
+      privateKey: this.configService.get('jwt.refreshPrivateKey'),
+      expiresIn: this.configService.get('jwt.refreshExpiresIn'),
       algorithm: 'RS256',
     });
 

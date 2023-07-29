@@ -16,6 +16,7 @@ import { AuthConsumer } from './queues/auth-consumer';
 import { LoggerModule } from 'src/shared/logger/logger.module';
 import { RemovePasswordInterceptor } from 'src/shared/interceptors/interceptor-password';
 import { APP_INTERCEPTOR } from '@nestjs/core/constants';
+import { JwtActivateStrategy } from './strategies/jwt-activate.strategy';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core/constants';
     LocalStrategy,
     JwtStrategy,
     JwtRefreshStrategy,
+    JwtActivateStrategy,
     AuthProducerService,
     PrismaService,
     AuthConsumer,

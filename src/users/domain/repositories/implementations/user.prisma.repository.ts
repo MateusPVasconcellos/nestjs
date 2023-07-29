@@ -1,31 +1,33 @@
 import { UsersRepository } from '../user.repository.interface';
 import { PrismaService } from 'src/database/prisma.service';
 import { User } from '../../entities/user.entity';
+import { Prisma } from '@prisma/client';
 
 export class UsersPrismaRepository implements UsersRepository {
   constructor(private prisma: PrismaService) {}
-
-  async create(user: User): Promise<User> {
-    const createdUser = await this.prisma.user.create({
-      data: {
-        role_id: 'clkmr3its0000ty1ovaizqdx4',
-        email: user.email,
-        password: user.password,
-      },
-    });
-
-    return createdUser;
+  create(params: { data: Prisma.UserCreateInput }): Promise<User> {
+    return this.prisma.user.create({ data: params.data });
   }
 
-  async findAll(): Promise<User[]> {
-    return await this.prisma.user.findMany();
+  update(params: {
+    where: Prisma.UserWhereUniqueInput;
+    data: Prisma.UserUpdateInput;
+  }): Promise<User> {
+    return this.prisma.user.update({ where: params.where, data: params.data });
   }
 
-  async findByEmail(email: string): Promise<User> {
-    return await this.prisma.user.findFirst({
-      where: {
-        email,
-      },
-    });
+  findOne(params: { where: Prisma.UserWhereUniqueInput }): Promise<User> {
+    return this.prisma.user.findFirst({ where: params.where });
+  }
+
+  findMany(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.UserWhereUniqueInput;
+    where?: Prisma.UserWhereInput;
+    orderBy?: Prisma.UserOrderByWithRelationInput;
+  }): Promise<User[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.user.findMany({ skip, take, cursor, where, orderBy });
   }
 }

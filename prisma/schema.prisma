@@ -43,8 +43,8 @@ model UserRefreshToken {
 model UserDetail {
   id           String   @id @default(cuid())
   name         String   @db.VarChar(100)
-  phone_number String   @db.VarChar(20)
-  avatar_url   String   @db.VarChar(200)
+  phone_number String?  @db.VarChar(20)
+  avatar_url   String?  @db.VarChar(200)
   type_person  String   @db.Char(1)
   cpf_cnpj     String   @db.VarChar(14)
   user_id      String   @unique

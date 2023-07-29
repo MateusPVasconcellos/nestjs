@@ -4,7 +4,7 @@ import { Match } from 'src/shared/decorators/match-decorator';
 
 export class CreateUserDto {
   @IsNotEmpty()
-  @Length(5, 50)
+  @MaxLength(50)
   name: string;
 
   @IsNotEmpty()
@@ -20,6 +20,10 @@ export class CreateUserDto {
   @IsEmail()
   @MaxLength(50)
   email: string;
+
+  cpf_cnpj: string;
+
+  type_person: string;
 
   toJSON() {
     return instanceToPlain(this);

@@ -1,6 +1,6 @@
 export class UserPayload {
-  sub: string;
-  email: string;
+  sub?: string;
+  email?: string;
   iat?: number;
   exp?: number;
   jti?: string;
