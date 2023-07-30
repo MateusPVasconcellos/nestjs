@@ -7,13 +7,17 @@ export interface UsersRepository {
     where: Prisma.UserWhereUniqueInput;
     data: Prisma.UserUpdateInput;
   }): Promise<User>;
-  findOne(params: { where: Prisma.UserWhereUniqueInput }): Promise<User>;
+  findOne(params: {
+    where: Prisma.UserWhereUniqueInput;
+    include?: Prisma.UserInclude;
+  }): Promise<User>;
   findMany(params: {
     skip?: number;
     take?: number;
     cursor?: Prisma.UserWhereUniqueInput;
     where?: Prisma.UserWhereInput;
     orderBy?: Prisma.UserOrderByWithRelationInput;
+    include?: Prisma.UserInclude;
   }): Promise<User[]>;
 }
 

@@ -16,8 +16,14 @@ export class UsersPrismaRepository implements UsersRepository {
     return this.prisma.user.update({ where: params.where, data: params.data });
   }
 
-  findOne(params: { where: Prisma.UserWhereUniqueInput }): Promise<User> {
-    return this.prisma.user.findFirst({ where: params.where });
+  findOne(params: {
+    where: Prisma.UserWhereUniqueInput;
+    include?: Prisma.UserInclude;
+  }): Promise<User> {
+    return this.prisma.user.findFirst({
+      where: params.where,
+      include: params.include,
+    });
   }
 
   findMany(params: {
@@ -26,8 +32,16 @@ export class UsersPrismaRepository implements UsersRepository {
     cursor?: Prisma.UserWhereUniqueInput;
     where?: Prisma.UserWhereInput;
     orderBy?: Prisma.UserOrderByWithRelationInput;
+    include?: Prisma.UserInclude;
   }): Promise<User[]> {
-    const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.user.findMany({ skip, take, cursor, where, orderBy });
+    const { skip, take, cursor, where, orderBy, include } = params;
+    return this.prisma.user.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+      include,
+    });
   }
 }

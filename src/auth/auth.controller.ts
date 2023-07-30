@@ -57,6 +57,12 @@ export class AuthController {
     return this.authService.activate(token);
   }
 
+  @IsPublic()
+  @Get('resend-activate')
+  resendActivate(@Query('email') email: string) {
+    return this.authService.resendActivate(email);
+  }
+
   @Get('/me')
   getMe(@CurrentUser() user: User) {
     return user;

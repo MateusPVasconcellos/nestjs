@@ -17,8 +17,12 @@ export class AuthPrismaRepository implements AuthRepository {
 
   findOne(params: {
     where: Prisma.UserRefreshTokenWhereUniqueInput;
+    include?: Prisma.UserRefreshTokenInclude;
   }): Promise<UserRefreshToken> {
-    return this.prisma.userRefreshToken.findFirst({ where: params.where });
+    return this.prisma.userRefreshToken.findFirst({
+      where: params.where,
+      include: params.include,
+    });
   }
 
   delete(params: { where: Prisma.UserRefreshTokenWhereUniqueInput }) {

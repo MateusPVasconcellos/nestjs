@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Inject,
   Injectable,
   UnauthorizedException,
@@ -40,19 +41,18 @@ export class AuthService {
   }
 
   async signin(user: User): Promise<UserToken> {
-    const storedUser = await this.userRepository.findOne({
-      where: { email: user.email },
+    const oldToken = await this.authRepository.findOne({
+      where: { user_id: user.id },
+      include: {
+        user: true,
+      },
     });
 
-    if (!storedUser.active) {
-      throw new UnauthorizedException('User is not active');
+    if (!oldToken.user.active) {
+      throw new ForbiddenException('User is not active');
     }
 
     const tokens = await this.jwtService.generateTokens(user);
-
-    const oldToken = await this.authRepository.findOne({
-      where: { user_id: user.id },
-    });
 
     if (!oldToken) {
       await this.authRepository.create({
@@ -146,12 +146,32 @@ export class AuthService {
 
   async activate(token: string) {
     const { sub } = this.jwtService.decodeToken(token);
-    const user = await this.userRepository.findOne({ where: { email: sub } });
+    const user = await this.userRepository.findOne({
+      where: { email: sub },
+    });
 
     if (user.active) throw new UnauthorizedException();
 
     const params = { where: { email: sub }, data: { active: true } };
     return this.userRepository.update(params);
+  }
+
+  async resendActivate(email: string) {
+    const storedUser = await this.userRepository.findOne({
+      where: { email: email },
+      include: {
+        userDetail: true,
+      },
+    });
+
+    if (storedUser.active)
+      throw new BadRequestException('User is already active');
+
+    const activateToken = this.jwtService.generateActivateToken(email);
+
+    await this.authProducer.sendActivateEmail(
+      new UserCreatedEvent(storedUser.userDetail.name, email, activateToken),
+    );
   }
 
   async validateUser(email: string, password: string) {
@@ -169,7 +189,9 @@ export class AuthService {
       );
     }
 
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userRepository.findOne({
+      where: { email },
+    });
     if (user) {
       const isPasswordValid = await this.crypt.compare(password, user.password);
 

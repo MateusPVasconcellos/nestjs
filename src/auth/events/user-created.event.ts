@@ -1,7 +1,7 @@
 export class UserCreatedEvent {
   constructor(
-    readonly name: string,
-    readonly email: string,
-    readonly activateToken: string,
+    readonly name?: string,
+    readonly email?: string,
+    readonly activateToken?: string,
   ) {}
 }
