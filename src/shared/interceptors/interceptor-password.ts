@@ -18,7 +18,7 @@ export class RemovePasswordInterceptor implements NestInterceptor {
               e.password = undefined;
             });
           }
-          'password' in value ?? (value.password = undefined);
+          if (value.password) value.password = undefined;
           return value;
         }
       }),

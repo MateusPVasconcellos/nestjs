@@ -153,7 +153,7 @@ export class AuthService {
       where: { email: decodedToken.email },
     });
 
-    if (user.active) throw new UnauthorizedException();
+    //if (user.active) throw new UnauthorizedException();
 
     const params = {
       where: { email: decodedToken.email },
