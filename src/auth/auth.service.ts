@@ -47,7 +47,7 @@ export class AuthService {
   async signin(user: User): Promise<UserToken> {
     const userStored = await this.userRepository.findOne({
       where: { email: user.email },
-      select: {
+      include: {
         userRefreshToken: true,
       },
     });
@@ -165,8 +165,7 @@ export class AuthService {
   async resendActivate(email: string) {
     const user = await this.userRepository.findOne({
       where: { email: email },
-      select: {
-        active: true,
+      include: {
         userDetail: true,
       },
     });
@@ -182,9 +181,8 @@ export class AuthService {
   async sendRecoveryEmail(email: string) {
     const user = await this.userRepository.findOne({
       where: { email: email },
-      select: {
+      include: {
         userDetail: true,
-        password: true,
       },
     });
 

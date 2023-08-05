@@ -18,11 +18,11 @@ export class UsersPrismaRepository implements UsersRepository {
 
   findOne(params: {
     where: Prisma.UserWhereUniqueInput;
-    select?: Prisma.UserSelect;
+    include?: Prisma.UserInclude;
   }): Promise<User> {
     return this.prisma.user.findFirst({
       where: params.where,
-      select: params.select,
+      include: params.include,
     });
   }
 
@@ -32,16 +32,16 @@ export class UsersPrismaRepository implements UsersRepository {
     cursor?: Prisma.UserWhereUniqueInput;
     where?: Prisma.UserWhereInput;
     orderBy?: Prisma.UserOrderByWithRelationInput;
-    select?: Prisma.UserSelect;
+    include?: Prisma.UserInclude;
   }): Promise<User[]> {
-    const { skip, take, cursor, where, orderBy, select } = params;
+    const { skip, take, cursor, where, orderBy, include } = params;
     return this.prisma.user.findMany({
       skip,
       take,
       cursor,
       where,
       orderBy,
-      select,
+      include,
     });
   }
 }
