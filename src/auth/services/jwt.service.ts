@@ -2,7 +2,6 @@ import { UserPayload } from '../models/user-payload.model';
 import { UserToken } from '../models/user-token.model';
 import { User } from 'src/users/domain/entities/user.entity';
 import { JwtService as JwtNest } from '@nestjs/jwt';
-import { CryptService } from 'src/shared/crypt/crypt.service';
 import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common/decorators/core/injectable.decorator';
 import { v4 as uuidv4 } from 'uuid';
@@ -11,7 +10,6 @@ import { v4 as uuidv4 } from 'uuid';
 export class JwtService {
   constructor(
     private readonly jwtNest: JwtNest,
-    private readonly crypt: CryptService,
     private readonly configService: ConfigService,
   ) {}
   async generateTokens(user: User): Promise<UserToken> {
@@ -52,17 +50,34 @@ export class JwtService {
     return decodedToken as UserPayload;
   }
 
+  verifyToken(token: string, key: string): UserPayload {
+    const decodedToken = this.jwtNest.verify(token, { secret: key });
+    return decodedToken as UserPayload;
+  }
+
   generateActivateToken(email: string) {
     const tokenPayload = {
-      sub: email,
+      email: email,
     };
 
     const activateToken = this.jwtNest.sign(tokenPayload, {
-      privateKey: this.configService.get('jwt.refreshPrivateKey'),
-      expiresIn: this.configService.get('jwt.refreshExpiresIn'),
+      privateKey: this.configService.get('jwt.activatePrivateKey'),
+      expiresIn: this.configService.get('jwt.activateExpiresIn'),
       algorithm: 'RS256',
     });
 
     return activateToken;
+  }
+
+  generateRecoveryToken(hash: string, email: string) {
+    const tokenPayload = {
+      email: email,
+    };
+    const recoveryToken = this.jwtNest.sign(tokenPayload, {
+      secret: hash,
+      expiresIn: this.configService.get('jwt.recoveryExpiresIn'),
+    });
+
+    return recoveryToken;
   }
 }

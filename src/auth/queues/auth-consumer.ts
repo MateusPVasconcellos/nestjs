@@ -3,6 +3,7 @@ import { OnQueueFailed, Process, Processor } from '@nestjs/bull';
 import { HttpException } from '@nestjs/common';
 import { Job } from 'bull';
 import { UserCreatedEvent } from '../events/user-created.event';
+import { RecoveryEmailEvent } from '../events/send-recovery-email.event';
 
 @Processor('authQueue')
 class AuthConsumer {
@@ -15,7 +16,7 @@ class AuthConsumer {
   }
 
   @Process('authQueue.sendActivateEmail')
-  async sendMailJob(job: Job<UserCreatedEvent>) {
+  async sendActivateMailJob(job: Job<UserCreatedEvent>) {
     const { data } = job;
     await this.mailService.sendMail({
       to: data.email,
@@ -24,6 +25,17 @@ class AuthConsumer {
       text:
         'Your registration was successful, click in the link to activate your account.' +
         data.activateToken,
+    });
+  }
+
+  @Process('authQueue.sendRecoveryEmail')
+  async sendRecoveryEmailJob(job: Job<RecoveryEmailEvent>) {
+    const { data } = job;
+    await this.mailService.sendMail({
+      to: data.email,
+      from: 'Team G',
+      subject: 'Welcome!',
+      text: 'Follow the link to reset your password' + data.recoveryToken,
     });
   }
 }

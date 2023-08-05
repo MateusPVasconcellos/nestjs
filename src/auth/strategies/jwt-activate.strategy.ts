@@ -15,14 +15,13 @@ export class JwtActivateStrategy extends PassportStrategy(
         ExtractJwt.fromUrlQueryParameter('token'),
       ]),
       ignoreExpiration: false,
-      secretOrKey: configService.get('jwt.refreshPublicKey'),
+      secretOrKey: configService.get('jwt.activatePublicKey'),
       algorithms: ['RS256'],
       passReqToCallback: true,
     });
   }
   async validate(payload: UserPayload) {
     return {
-      id: payload.sub,
       email: payload.email,
     };
   }

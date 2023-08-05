@@ -24,6 +24,10 @@ import {
   USERS_REPOSITORY_TOKEN,
   UsersRepository,
 } from 'src/users/domain/repositories/user.repository.interface';
+import { RecoveryEmailEvent } from './events/send-recovery-email.event';
+import { RecoveryPasswordDto } from 'src/auth/dto/recovery-password.dto';
+import { AuthRequestDto } from './dto/auth-request.dto';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -41,20 +45,19 @@ export class AuthService {
   }
 
   async signin(user: User): Promise<UserToken> {
-    const oldToken = await this.authRepository.findOne({
-      where: { user_id: user.id },
-      include: {
-        user: true,
+    const userStored = await this.userRepository.findOne({
+      where: { email: user.email },
+      select: {
+        userRefreshToken: true,
       },
     });
-
-    if (!oldToken.user.active) {
+    if (userStored?.active === false) {
       throw new ForbiddenException('User is not active');
     }
 
     const tokens = await this.jwtService.generateTokens(user);
 
-    if (!oldToken) {
+    if (!userStored?.userRefreshToken?.jti_refresh_token) {
       await this.authRepository.create({
         data: {
           jti_refresh_token: tokens.jti,
@@ -145,33 +148,72 @@ export class AuthService {
   }
 
   async activate(token: string) {
-    const { sub } = this.jwtService.decodeToken(token);
+    const decodedToken = this.jwtService.decodeToken(token);
     const user = await this.userRepository.findOne({
-      where: { email: sub },
+      where: { email: decodedToken.email },
     });
 
     if (user.active) throw new UnauthorizedException();
 
-    const params = { where: { email: sub }, data: { active: true } };
+    const params = {
+      where: { email: decodedToken.email },
+      data: { active: true },
+    };
     return this.userRepository.update(params);
   }
 
   async resendActivate(email: string) {
-    const storedUser = await this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { email: email },
-      include: {
+      select: {
+        active: true,
         userDetail: true,
       },
     });
-
-    if (storedUser.active)
-      throw new BadRequestException('User is already active');
+    if (user.active) throw new BadRequestException('User is already active');
 
     const activateToken = this.jwtService.generateActivateToken(email);
 
     await this.authProducer.sendActivateEmail(
-      new UserCreatedEvent(storedUser.userDetail.name, email, activateToken),
+      new UserCreatedEvent(user.userDetail.name, email, activateToken),
     );
+  }
+
+  async sendRecoveryEmail(email: string) {
+    const user = await this.userRepository.findOne({
+      where: { email: email },
+      select: {
+        userDetail: true,
+        password: true,
+      },
+    });
+
+    if (!user) throw new BadRequestException();
+
+    const recoveryToken = this.jwtService.generateRecoveryToken(
+      user.password,
+      email,
+    );
+
+    await this.authProducer.sendRecoveryEmail(
+      new RecoveryEmailEvent(email, recoveryToken),
+    );
+  }
+
+  async recoveryPassword(
+    recoveryPasswordDto: RecoveryPasswordDto,
+    req: AuthRequestDto,
+  ) {
+    const hashedPassword = await this.crypt.hash(
+      recoveryPasswordDto.password,
+      8,
+    );
+    recoveryPasswordDto.password = hashedPassword;
+
+    await this.userRepository.update({
+      where: { email: req.user.email },
+      data: { password: recoveryPasswordDto.password },
+    });
   }
 
   async validateUser(email: string, password: string) {
@@ -216,5 +258,19 @@ export class AuthService {
       if (jti_refresh_token !== decodedToken.jti)
         throw new UnauthorizedException();
     }
+  }
+  async validateRecoveryToken(token: string, request: Request) {
+    const decodedToken = this.jwtService.decodeToken(token);
+    const user = await this.userRepository.findOne({
+      where: { email: decodedToken.email },
+    });
+
+    try {
+      const payload = this.jwtService.verifyToken(token, user.password);
+      request['user'] = { ...payload, password: undefined };
+    } catch {
+      throw new UnauthorizedException();
+    }
+    return true;
   }
 }

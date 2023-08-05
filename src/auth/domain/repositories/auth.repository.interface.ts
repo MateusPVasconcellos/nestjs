@@ -10,7 +10,7 @@ export interface AuthRepository {
   delete(params: { where: Prisma.UserRefreshTokenWhereUniqueInput });
   findOne(params: {
     where: Prisma.UserRefreshTokenWhereUniqueInput;
-    include?: Prisma.UserRefreshTokenInclude;
+    select?: Prisma.UserRefreshTokenSelect;
   }): Promise<UserRefreshToken>;
 }
 

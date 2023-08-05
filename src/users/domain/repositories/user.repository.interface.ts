@@ -9,7 +9,7 @@ export interface UsersRepository {
   }): Promise<User>;
   findOne(params: {
     where: Prisma.UserWhereUniqueInput;
-    include?: Prisma.UserInclude;
+    select?: Prisma.UserSelect;
   }): Promise<User>;
   findMany(params: {
     skip?: number;
@@ -17,7 +17,7 @@ export interface UsersRepository {
     cursor?: Prisma.UserWhereUniqueInput;
     where?: Prisma.UserWhereInput;
     orderBy?: Prisma.UserOrderByWithRelationInput;
-    include?: Prisma.UserInclude;
+    select?: Prisma.UserSelect;
   }): Promise<User[]>;
 }
 

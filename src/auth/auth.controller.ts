@@ -18,6 +18,8 @@ import { IsPublic } from './decorators/is-public.decoretor';
 import { JwtRefreshAuthGuard } from './guards/jwt-refresh-auth.guard';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { JwtActivateAuthGuard } from './guards/jwt-activate.guard';
+import { RecoveryPasswordDto } from 'src/auth/dto/recovery-password.dto';
+import { JwtRecoveryAuthGuard } from './guards/jwt-recovery.guard';
 
 @Controller()
 export class AuthController {
@@ -61,6 +63,22 @@ export class AuthController {
   @Get('resend-activate')
   resendActivate(@Query('email') email: string) {
     return this.authService.resendActivate(email);
+  }
+
+  @IsPublic()
+  @Get('recovery-email')
+  sendRecoveryEmail(@Query('email') email: string) {
+    return this.authService.sendRecoveryEmail(email);
+  }
+
+  @IsPublic()
+  @Post('recovery')
+  @UseGuards(JwtRecoveryAuthGuard)
+  recoveryPassword(
+    @Body() recoveryPasswordDto: RecoveryPasswordDto,
+    @Request() req: AuthRequestDto,
+  ) {
+    return this.authService.recoveryPassword(recoveryPasswordDto, req);
   }
 
   @Get('/me')
